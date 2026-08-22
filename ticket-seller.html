@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>판매처 대시보드 — Whale Shark Ticket</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/ticket-portal.css" />
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+</head>
+<body>
+<div class="portal-body">
+  <div class="portal-shell">
+    <div class="portal-header">
+      <div>
+        <h1 class="portal-title" id="seller-name">판매처 대시보드</h1>
+        <p class="portal-subtitle">내 판매처의 티켓과 투어 날짜 그룹만 관리할 수 있습니다</p>
+      </div>
+      <button class="portal-signout" id="btn-signout" style="display:none">로그아웃</button>
+    </div>
+
+    <div id="access-denied" class="portal-card" style="display:none">
+      <p class="portal-message error">접근 권한이 없습니다. 보라카이션 관리자에게 판매처용 링크를 요청해주세요.</p>
+    </div>
+
+    <div id="seller-app" style="display:none">
+      <div class="portal-card">
+        <div class="stat-grid">
+          <div class="stat-tile"><span class="stat-label">배정</span><span class="stat-value" id="stat-allocated">-</span></div>
+          <div class="stat-tile accent"><span class="stat-label">잔여</span><span class="stat-value" id="stat-remaining">-</span></div>
+          <div class="stat-tile"><span class="stat-label">사용</span><span class="stat-value" id="stat-used">-</span></div>
+          <div class="stat-tile warn"><span class="stat-label">취소</span><span class="stat-value" id="stat-cancelled">-</span></div>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <h2>티켓 구매 요청</h2>
+        <form id="request-form" class="portal-form">
+          <div class="form-row">
+            <div class="field">
+              <label for="request-qty">요청 수량</label>
+              <input type="number" id="request-qty" min="1" step="1" required />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-small" style="justify-self:start">요청 보내기</button>
+        </form>
+        <div id="request-message"></div>
+        <div class="portal-table-wrap" style="margin-top:16px">
+          <table class="portal-table">
+            <thead><tr><th>요청일</th><th>수량</th><th>상태</th></tr></thead>
+            <tbody id="request-list"><tr><td colspan="3" class="portal-empty">요청 내역이 없습니다.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <h2>투어 날짜 그룹 등록</h2>
+        <p class="portal-subtitle" style="margin-bottom:16px">
+          QR 1개 = 해당 날짜의 전체 인원. 고객 개인정보는 입력하지 않습니다.
+        </p>
+        <form id="group-form" class="portal-form">
+          <div class="form-row">
+            <div class="field"><label for="g-date">방문일</label><input type="date" id="g-date" required /></div>
+            <div class="field"><label for="g-people">총 인원</label><input type="number" id="g-people" min="1" step="1" required /></div>
+          </div>
+          <button type="submit" class="btn" style="justify-self:start">그룹 등록 + QR 발급</button>
+        </form>
+        <div id="group-message"></div>
+      </div>
+
+      <div class="portal-card">
+        <h2>내 투어 그룹 목록</h2>
+        <div class="portal-table-wrap">
+          <table class="portal-table">
+            <thead>
+              <tr><th>방문일</th><th>인원</th><th>상태</th><th>액션</th></tr>
+            </thead>
+            <tbody id="group-list"><tr><td colspan="4" class="portal-empty">등록된 그룹이 없습니다.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script type="module">
+import { requireAccess, signOutAccess } from "./js/ticket-access.js";
+import { db, functions } from "./js/firebase-config.js";
+import {
+  doc,
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const requestTicketsFn = httpsCallable(functions, "requestTickets");
+const createGroupFn = httpsCallable(functions, "createGroup");
+const updateGroupFn = httpsCallable(functions, "updateGroup");
+const cancelGroupFn = httpsCallable(functions, "cancelGroup");
+const reissueQrFn = httpsCallable(functions, "reissueQr");
+
+const STATUS_LABEL = { ISSUED: "발급", USED: "사용완료", CANCELLED: "취소됨" };
+const STATUS_BADGE = { ISSUED: "badge-issued", USED: "badge-used", CANCELLED: "badge-cancelled" };
+const REQUEST_STATUS_LABEL = { pending: "대기", approved: "승인", rejected: "거절" };
+
+let sellerId = null;
+let groupsCache = new Map();
+
+function fmtDate(ts) {
+  if (!ts) return "-";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString("ko-KR");
+}
+
+function checkUrl(qrToken) {
+  return new URL(`ticket-check.html?t=${qrToken}`, window.location.href).href;
+}
+
+function closeModal() {
+  document.getElementById("modal-root").innerHTML = "";
+}
+
+function openQrModal(group) {
+  const root = document.getElementById("modal-root");
+  root.innerHTML = `
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal-box">
+        <h2>QR 티켓 (${group.visitDate} · ${group.partySize ?? ""}명)</h2>
+        <div class="qr-preview">
+          <canvas id="qr-canvas"></canvas>
+          <div class="link-row"><code id="qr-link">${checkUrl(group.qrToken)}</code></div>
+        </div>
+        <div class="modal-close-row">
+          <button class="btn btn-ghost btn-small" id="btn-reissue">QR 재발급</button>
+          <button class="btn btn-small" id="btn-close">닫기</button>
+        </div>
+      </div>
+    </div>
+  `;
+  QRCode.toCanvas(document.getElementById("qr-canvas"), checkUrl(group.qrToken), { width: 220 });
+  document.getElementById("btn-close").addEventListener("click", closeModal);
+  document.getElementById("modal-overlay").addEventListener("click", (e) => {
+    if (e.target.id === "modal-overlay") closeModal();
+  });
+  document.getElementById("btn-reissue").addEventListener("click", async () => {
+    if (!confirm("QR을 재발급하면 기존 QR은 더 이상 사용할 수 없습니다. 계속할까요?")) return;
+    try {
+      const { data } = await reissueQrFn({ groupId: group.id });
+      openQrModal({ ...group, qrToken: data.qrToken });
+    } catch (err) {
+      alert(err.message || "재발급 중 오류가 발생했습니다.");
+    }
+  });
+}
+
+function openEditModal(group) {
+  const root = document.getElementById("modal-root");
+  root.innerHTML = `
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal-box">
+        <h2>그룹 수정</h2>
+        <form id="edit-form" class="portal-form">
+          <div class="field"><label>방문일</label><input type="date" id="edit-date" value="${group.visitDate}" required /></div>
+          <div class="field"><label>총 인원</label><input type="number" id="edit-people" min="1" value="${group.partySize}" required /></div>
+          <div id="edit-message"></div>
+          <div class="modal-close-row">
+            <button type="button" class="btn btn-ghost btn-small" id="btn-cancel-edit">닫기</button>
+            <button type="submit" class="btn btn-small">저장</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+  document.getElementById("btn-cancel-edit").addEventListener("click", closeModal);
+  document.getElementById("modal-overlay").addEventListener("click", (e) => {
+    if (e.target.id === "modal-overlay") closeModal();
+  });
+  document.getElementById("edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
+      await updateGroupFn({
+        groupId: group.id,
+        visitDate: document.getElementById("edit-date").value,
+        partySize: Number(document.getElementById("edit-people").value),
+      });
+      closeModal();
+    } catch (err) {
+      document.getElementById("edit-message").innerHTML = `<p class="portal-message error">${err.message || "수정 중 오류가 발생했습니다."}</p>`;
+    }
+  });
+}
+
+async function handleCancel(group) {
+  if (!confirm(`${group.visitDate} 그룹(${group.partySize}명)을 취소할까요?`)) return;
+  const reason = prompt("취소 사유(선택):", "") || "";
+  try {
+    await cancelGroupFn({ groupId: group.id, reason });
+  } catch (err) {
+    alert(err.message || "취소 중 오류가 발생했습니다.");
+  }
+}
+
+function renderGroups() {
+  const listEl = document.getElementById("group-list");
+  if (groupsCache.size === 0) {
+    listEl.innerHTML = `<tr><td colspan="4" class="portal-empty">등록된 그룹이 없습니다.</td></tr>`;
+    return;
+  }
+  const rows = [...groupsCache.entries()]
+    .sort((a, b) => (a[1].visitDate < b[1].visitDate ? 1 : -1))
+    .map(([id, g]) => {
+      const badge = `<span class="badge ${STATUS_BADGE[g.status] || ""}">${STATUS_LABEL[g.status] || g.status}</span>`;
+      const actions = [`<button class="btn btn-ghost btn-small" data-action="qr" data-id="${id}">QR</button>`];
+      if (g.status === "ISSUED") {
+        actions.push(`<button class="btn btn-ghost btn-small" data-action="edit" data-id="${id}">수정</button>`);
+        actions.push(`<button class="btn btn-danger btn-small" data-action="cancel" data-id="${id}">취소</button>`);
+      }
+      return `<tr>
+        <td>${g.visitDate}</td>
+        <td>${g.partySize}명</td>
+        <td>${badge}</td>
+        <td>${actions.join(" ")}</td>
+      </tr>`;
+    });
+  listEl.innerHTML = rows.join("");
+}
+
+document.getElementById("group-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+  const group = { id: btn.dataset.id, ...groupsCache.get(btn.dataset.id) };
+  if (btn.dataset.action === "qr") openQrModal(group);
+  if (btn.dataset.action === "edit") openEditModal(group);
+  if (btn.dataset.action === "cancel") handleCancel(group);
+});
+
+function renderRequests(snapshot) {
+  const listEl = document.getElementById("request-list");
+  if (snapshot.empty) {
+    listEl.innerHTML = `<tr><td colspan="3" class="portal-empty">요청 내역이 없습니다.</td></tr>`;
+    return;
+  }
+  const rows = [];
+  snapshot.forEach((docSnap) => {
+    const r = docSnap.data();
+    rows.push(`<tr>
+      <td>${fmtDate(r.requestedAt)}</td>
+      <td>${r.requestedQty}장</td>
+      <td><span class="badge ${r.status === "approved" ? "badge-used" : r.status === "rejected" ? "badge-cancelled" : "badge-pending"}">${REQUEST_STATUS_LABEL[r.status] || r.status}</span></td>
+    </tr>`);
+  });
+  listEl.innerHTML = rows.join("");
+}
+
+document.getElementById("request-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const qty = Number(document.getElementById("request-qty").value);
+  const msgEl = document.getElementById("request-message");
+  msgEl.innerHTML = "";
+  try {
+    await requestTicketsFn({ requestedQty: qty });
+    msgEl.innerHTML = `<p class="portal-message success">요청이 전송되었습니다.</p>`;
+    e.target.reset();
+  } catch (err) {
+    msgEl.innerHTML = `<p class="portal-message error">${err.message || "요청 중 오류가 발생했습니다."}</p>`;
+  }
+});
+
+document.getElementById("group-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msgEl = document.getElementById("group-message");
+  msgEl.innerHTML = "";
+  const visitDate = document.getElementById("g-date").value;
+  const partySize = Number(document.getElementById("g-people").value);
+  try {
+    const { data } = await createGroupFn({ sellerId, visitDate, partySize });
+    msgEl.innerHTML = `<p class="portal-message success">그룹이 등록되었습니다.</p>`;
+    e.target.reset();
+    openQrModal({ id: data.groupId, qrToken: data.qrToken, visitDate, partySize });
+  } catch (err) {
+    msgEl.innerHTML = `<p class="portal-message error">${err.message || "그룹 등록 중 오류가 발생했습니다."}</p>`;
+  }
+});
+
+function initListeners() {
+  onSnapshot(doc(db, "sellers", sellerId), (snap) => {
+    if (!snap.exists()) return;
+    const s = snap.data();
+    document.getElementById("seller-name").textContent = `${s.name} 대시보드`;
+    document.getElementById("stat-allocated").textContent = s.allocatedTotal;
+    document.getElementById("stat-remaining").textContent = s.allocatedTotal - s.consumedCount;
+    document.getElementById("stat-used").textContent = s.usedCount;
+    document.getElementById("stat-cancelled").textContent = s.cancelledCount;
+  });
+
+  onSnapshot(
+    query(collection(db, "purchaseRequests"), where("sellerId", "==", sellerId), orderBy("requestedAt", "desc")),
+    renderRequests
+  );
+
+  onSnapshot(
+    query(collection(db, "ticketGroups"), where("sellerId", "==", sellerId)),
+    (snapshot) => {
+      groupsCache = new Map();
+      snapshot.forEach((docSnap) => groupsCache.set(docSnap.id, docSnap.data()));
+      renderGroups();
+    }
+  );
+}
+
+requireAccess("B")
+  .then(({ sellerId: sid }) => {
+    sellerId = sid;
+    document.getElementById("seller-app").style.display = "block";
+    document.getElementById("btn-signout").style.display = "inline-flex";
+    initListeners();
+  })
+  .catch(() => {
+    document.getElementById("access-denied").style.display = "block";
+  });
+
+document.getElementById("btn-signout").addEventListener("click", () => {
+  signOutAccess().then(() => window.location.reload());
+});
+</script>
+</body>
+</html>

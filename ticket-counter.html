@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LIBERTAD WHALE SHARK COUNTER</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/ticket-portal.css" />
+</head>
+<body>
+<div class="portal-body">
+  <div class="portal-shell" style="max-width:520px;">
+    <div class="portal-header">
+      <div>
+        <h1 class="portal-title">LIBERTAD WHALE SHARK COUNTER</h1>
+        <p class="portal-subtitle">QR 체크인 합계와 실물 카운트를 비교합니다</p>
+      </div>
+      <button class="portal-signout" id="btn-signout" style="display:none">로그아웃</button>
+    </div>
+
+    <div id="access-denied" class="portal-card" style="display:none">
+      <p class="portal-message error">접근 권한이 없습니다. 보라카이션 관리자에게 링크를 요청해주세요.</p>
+    </div>
+
+    <div id="counter-app" style="display:none">
+      <div class="portal-card">
+        <div class="portal-form">
+          <div class="field">
+            <label for="date-input">날짜</label>
+            <input type="date" id="date-input" />
+          </div>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <div class="stat-grid">
+          <div class="stat-tile accent">
+            <span class="stat-label">QR CHECK-IN</span>
+            <span class="stat-value" id="qr-count">-</span>
+          </div>
+          <div class="stat-tile warn">
+            <span class="stat-label">PHYSICAL COUNT</span>
+            <span class="stat-value" id="physical-count">-</span>
+          </div>
+        </div>
+        <div style="text-align:center; margin-top:24px;">
+          <span class="stat-label" style="display:block; margin-bottom:8px;">DIFFERENCE</span>
+          <span class="counter-diff" id="diff-value">-</span>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <h2>실물 카운트 입력</h2>
+        <form id="physical-form" class="portal-form">
+          <div class="field">
+            <label for="physical-input">현장에서 직접 센 인원 수</label>
+            <input type="number" id="physical-input" min="0" step="1" required />
+          </div>
+          <button type="submit" class="btn">저장</button>
+        </form>
+        <div id="form-message"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { signOutAccess } from "./js/ticket-access.js";
+import { db, functions } from "./js/firebase-config.js";
+import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const setPhysicalCountFn = httpsCallable(functions, "setPhysicalCount");
+
+const dateInput = document.getElementById("date-input");
+const qrCountEl = document.getElementById("qr-count");
+const physicalCountEl = document.getElementById("physical-count");
+const diffEl = document.getElementById("diff-value");
+const physicalForm = document.getElementById("physical-form");
+const physicalInput = document.getElementById("physical-input");
+const formMessage = document.getElementById("form-message");
+
+let unsubscribe = null;
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function watchDate(date) {
+  if (unsubscribe) unsubscribe();
+  qrCountEl.textContent = "-";
+  physicalCountEl.textContent = "-";
+  diffEl.textContent = "-";
+  diffEl.className = "counter-diff";
+
+  unsubscribe = onSnapshot(doc(db, "dailyCounts", date), (snap) => {
+    const data = snap.exists() ? snap.data() : {};
+    const qr = data.qrCheckinCount || 0;
+    const physical = typeof data.physicalCount === "number" ? data.physicalCount : null;
+
+    qrCountEl.textContent = `${qr}명`;
+    physicalCountEl.textContent = physical === null ? "미입력" : `${physical}명`;
+
+    if (physical === null) {
+      diffEl.textContent = "-";
+      diffEl.className = "counter-diff";
+    } else {
+      const diff = physical - qr;
+      diffEl.textContent = (diff > 0 ? "+" : "") + diff;
+      diffEl.className = "counter-diff " + (diff === 0 ? "zero" : "nonzero");
+    }
+  });
+}
+
+dateInput.addEventListener("change", () => watchDate(dateInput.value));
+
+physicalForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  formMessage.innerHTML = "";
+  const count = Number(physicalInput.value);
+  if (!Number.isInteger(count) || count < 0) return;
+
+  try {
+    await setPhysicalCountFn({ date: dateInput.value, count });
+    formMessage.innerHTML = `<p class="portal-message success">저장되었습니다.</p>`;
+    physicalInput.value = "";
+  } catch (err) {
+    formMessage.innerHTML = `<p class="portal-message error">${err.message || "저장 중 오류가 발생했습니다."}</p>`;
+  }
+});
+
+document.getElementById("counter-app").style.display = "block";
+dateInput.value = todayKey();
+watchDate(dateInput.value);
+
+document.getElementById("btn-signout").addEventListener("click", () => {
+  signOutAccess().then(() => window.location.reload());
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# 운영 도구 페이지 — 크롤링 차단
+Disallow: /admin.html
+Disallow: /ticket-admin.html
+Disallow: /ticket-check.html
+Disallow: /ticket-counter.html
+Disallow: /ticket-seller.html
+Disallow: /success.html
+
+Sitemap: https://boracaywhaleshark.com/sitemap.xml

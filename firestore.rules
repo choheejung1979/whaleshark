@@ -1,0 +1,89 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------------
+    // 고래상어 티켓 시스템 (A/B/C) 권한 헬퍼
+    // 역할은 accessLinks 교환 시 Cloud Function이 발급하는 커스텀 클레임
+    // (request.auth.token.role / .sellerId) 으로만 결정됩니다.
+    // ---------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isA() {
+      return isSignedIn() && request.auth.token.role == 'A';
+    }
+    function isB() {
+      return isSignedIn() && request.auth.token.role == 'B';
+    }
+    function isC() {
+      return isSignedIn() && request.auth.token.role == 'C';
+    }
+    // request.auth.token.sellerId는 A/C 역할에서는 클레임에 아예 존재하지 않습니다
+    // (null을 넣지 않음). .get(key, default)로 안전하게 읽어야 list 쿼리 검증 시
+    // "Null value error" / "Property sellerId is undefined" 오류가 나지 않습니다.
+    function ownSellerId() {
+      return request.auth.token.get('sellerId', '');
+    }
+    function isOwnSeller(sellerId) {
+      return isB() && ownSellerId() == sellerId;
+    }
+
+    // 판매처(B) 마스터/집계 데이터. 배정/사용/취소 수치는 Cloud Function이
+    // 트랜잭션으로만 갱신하므로 클라이언트 쓰기는 전면 차단합니다.
+    match /sellers/{sellerId} {
+      allow read: if isA() || isOwnSeller(sellerId);
+      allow write: if false;
+    }
+
+    // 날짜별 그룹(총 인원) + QR 상태. 개별 고객 정보는 저장하지 않습니다.
+    // B는 자기 판매처 것만, A는 전체 열람.
+    match /ticketGroups/{groupId} {
+      allow read: if isA() || (isB() && resource.data.sellerId == ownSellerId());
+      allow write: if false;
+    }
+
+    // B -> A 티켓 구매 요청.
+    match /purchaseRequests/{requestId} {
+      allow read: if isA() || (isB() && resource.data.sellerId == ownSellerId());
+      allow write: if false;
+    }
+
+    // 판매처 정보가 없는 일별 집계(개인정보 없음)이므로 공개 열람 허용.
+    match /dailyCounts/{date} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 체크인/취소 감사 로그는 A만 열람.
+    match /checkinLogs/{logId} {
+      allow read: if isA();
+      allow write: if false;
+    }
+
+    // QR TOKEN -> 예약 매핑, 접근 링크 해시. Cloud Function(Admin SDK)만 접근.
+    match /qrTokens/{token} {
+      allow read, write: if false;
+    }
+    match /accessLinks/{tokenHash} {
+      allow read, write: if false;
+    }
+
+    match /reservations/{reservationId} {
+      // 누구나 새 예약을 "생성"할 수 있습니다 (예약 폼 제출).
+      // 필수 필드와 타입을 검증해 잘못된 데이터가 들어오는 것을 막습니다.
+      allow create: if
+        request.resource.data.keys().hasAll(['tourType', 'date', 'people', 'name', 'email', 'status']) &&
+        request.resource.data.tourType is string &&
+        request.resource.data.name is string &&
+        request.resource.data.email is string &&
+        request.resource.data.people is number &&
+        request.resource.data.status == 'pending';
+
+      // 관리자(admin.html, 진짜 Firebase 로그인)만 조회/수정/삭제 가능.
+      allow read, update, delete: if request.auth != null &&
+        request.auth.token.email == 'luca@boracaywhaleshark.com';
+    }
+  }
+}

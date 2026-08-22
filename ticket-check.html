@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>WHALE SHARK TICKET CHECK</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/ticket-portal.css" />
+</head>
+<body>
+<div class="check-screen">
+  <div class="check-card" id="check-card">
+    <p class="check-eyebrow">WHALE SHARK TICKET</p>
+    <h1>티켓 확인 중...</h1>
+    <div id="check-body"></div>
+  </div>
+</div>
+
+<script type="module">
+import { functions } from "./js/firebase-config.js";
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const getCheckStatus = httpsCallable(functions, "getCheckStatus");
+const checkInAction = httpsCallable(functions, "checkInAction");
+
+const titleEl = document.querySelector("#check-card h1");
+const bodyEl = document.getElementById("check-body");
+const params = new URLSearchParams(window.location.search);
+const token = params.get("t");
+
+const CANCEL_REASONS = ["잘못된 그룹", "방문일 불일치", "인원 불일치", "이미 사용됨", "기타"];
+
+function field(label, value) {
+  return `<div class="check-field"><span class="check-label">${label}</span><span class="check-value">${value}</span></div>`;
+}
+
+function renderNoToken() {
+  titleEl.textContent = "잘못된 접근";
+  bodyEl.innerHTML = `<p class="check-status-line error">QR을 다시 스캔해주세요.</p>`;
+}
+
+function renderNotFound() {
+  titleEl.textContent = "티켓을 찾을 수 없습니다";
+  bodyEl.innerHTML = `<p class="check-status-line error">존재하지 않는 티켓입니다.</p>`;
+}
+
+function renderReissued() {
+  titleEl.textContent = "재발급된 QR";
+  bodyEl.innerHTML = `<p class="check-status-line warn">이 QR은 재발급되어 더 이상 사용할 수 없습니다.<br/>고객에게 최신 QR을 요청해주세요.</p>`;
+}
+
+function renderCancelled(ticket) {
+  titleEl.textContent = "TICKET CANCELLED";
+  bodyEl.innerHTML = `
+    <p class="check-status-line error">이 티켓은 판매처에서 취소되었습니다.</p>
+    ${field("그룹 번호", ticket.groupCode)}
+    ${field("방문일", ticket.visitDate)}
+    ${field("인원", ticket.partySize + "명")}
+  `;
+}
+
+function renderAlreadyUsed(ticket) {
+  titleEl.textContent = "ALREADY USED";
+  const usedAt = ticket.usedAt ? new Date(ticket.usedAt).toLocaleString("ko-KR") : "-";
+  bodyEl.innerHTML = `
+    <p class="check-status-line warn">이미 사용된 티켓입니다.</p>
+    ${field("그룹 번호", ticket.groupCode)}
+    ${field("방문일", ticket.visitDate)}
+    ${field("인원", ticket.partySize + "명")}
+    ${field("사용 시간", usedAt)}
+    ${field("체크 장소", ticket.checkLocation || "-")}
+  `;
+}
+
+function renderUsedSuccess(ticket) {
+  titleEl.textContent = "체크인 완료";
+  bodyEl.innerHTML = `
+    <p class="check-status-line ok">OK — 입장 처리되었습니다.</p>
+    ${field("그룹 번호", ticket.groupCode)}
+    ${field("인원", ticket.partySize + "명")}
+  `;
+}
+
+function renderCancelLogged() {
+  titleEl.textContent = "기록 완료";
+  bodyEl.innerHTML = `<p class="check-status-line warn">CANCEL 처리가 기록되었습니다.</p>`;
+}
+
+function renderError(message) {
+  bodyEl.innerHTML = `<p class="check-status-line error">${message}</p>`;
+}
+
+function renderReady(ticket) {
+  titleEl.textContent = "WHALE SHARK TICKET";
+  bodyEl.innerHTML = `
+    ${field("그룹 번호", ticket.groupCode)}
+    ${field("방문일", ticket.visitDate)}
+    ${field("인원", ticket.partySize + "명")}
+    ${field("상태", "사용 가능")}
+    <div class="check-actions">
+      <button class="check-btn check-btn-ok" id="btn-ok">OK</button>
+      <button class="check-btn check-btn-cancel" id="btn-cancel">CANCEL</button>
+    </div>
+    <div id="cancel-reasons" style="display:none" class="cancel-reason-list"></div>
+    <div id="action-message"></div>
+  `;
+
+  document.getElementById("btn-ok").addEventListener("click", async () => {
+    setActionsDisabled(true);
+    try {
+      const { data } = await checkInAction({ token, action: "OK" });
+      renderUsedSuccess(data.ticket);
+    } catch (err) {
+      showActionMessage(err.message || "처리 중 오류가 발생했습니다.");
+      setActionsDisabled(false);
+    }
+  });
+
+  document.getElementById("btn-cancel").addEventListener("click", () => {
+    const list = document.getElementById("cancel-reasons");
+    list.style.display = "grid";
+    list.innerHTML = CANCEL_REASONS.map((r) => `<button type="button">${r}</button>`).join("");
+    list.querySelectorAll("button").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        setActionsDisabled(true);
+        try {
+          await checkInAction({ token, action: "CANCEL", reason: btn.textContent });
+          renderCancelLogged();
+        } catch (err) {
+          showActionMessage(err.message || "처리 중 오류가 발생했습니다.");
+          setActionsDisabled(false);
+        }
+      });
+    });
+  });
+}
+
+function setActionsDisabled(disabled) {
+  document.querySelectorAll(".check-btn").forEach((b) => (b.disabled = disabled));
+}
+function showActionMessage(message) {
+  const el = document.getElementById("action-message");
+  if (el) el.innerHTML = `<p class="portal-message error">${message}</p>`;
+}
+
+async function init() {
+  if (!token) {
+    renderNoToken();
+    return;
+  }
+  try {
+    const { data } = await getCheckStatus({ token });
+    switch (data.state) {
+      case "NOT_FOUND":
+        renderNotFound();
+        break;
+      case "REISSUED":
+        renderReissued();
+        break;
+      case "CANCELLED":
+        renderCancelled(data.ticket);
+        break;
+      case "ALREADY_USED":
+        renderAlreadyUsed(data.ticket);
+        break;
+      case "READY":
+        renderReady(data.ticket);
+        break;
+      default:
+        renderError("알 수 없는 상태입니다.");
+    }
+  } catch (err) {
+    console.error(err);
+    renderError("티켓 정보를 불러오지 못했습니다.");
+  }
+}
+
+init();
+</script>
+</body>
+</html>

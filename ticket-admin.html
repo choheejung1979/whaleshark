@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>보라카이션 관리자 — Whale Shark Ticket</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/ticket-portal.css" />
+</head>
+<body>
+<div class="portal-body">
+  <div class="portal-shell">
+    <div class="portal-header">
+      <div>
+        <h1 class="portal-title">보라카이션 관리자</h1>
+        <p class="portal-subtitle">고래상어 티켓 전체 재고 / 판매처 / 실시간 입장 현황</p>
+      </div>
+      <button class="portal-signout" id="btn-signout" style="display:none">로그아웃</button>
+    </div>
+
+    <div id="access-denied" class="portal-card" style="display:none">
+      <p class="portal-message error">접근 권한이 없습니다. 관리자 링크로만 접속할 수 있습니다.</p>
+    </div>
+
+    <div id="admin-app" style="display:none">
+      <div class="portal-card">
+        <h2>전체 현황 (TOTAL)</h2>
+        <div class="stat-grid">
+          <div class="stat-tile"><span class="stat-label">배정</span><span class="stat-value" id="t-allocated">-</span></div>
+          <div class="stat-tile accent"><span class="stat-label">잔여</span><span class="stat-value" id="t-remaining">-</span></div>
+          <div class="stat-tile"><span class="stat-label">실시간 입장</span><span class="stat-value" id="t-used">-</span></div>
+          <div class="stat-tile warn"><span class="stat-label">취소</span><span class="stat-value" id="t-cancelled">-</span></div>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <h2>판매처별 현황</h2>
+        <div class="portal-table-wrap">
+          <table class="portal-table">
+            <thead><tr><th>판매처</th><th>배정</th><th>잔여</th><th>입장</th><th>취소</th><th>액션</th></tr></thead>
+            <tbody id="seller-list"><tr><td colspan="6" class="portal-empty">불러오는 중...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <h3>새 판매처 등록</h3>
+        <form id="seller-form" class="portal-form">
+          <div class="form-row">
+            <div class="field"><label for="s-id">ID (영문 소문자/숫자/-/_)</label><input type="text" id="s-id" pattern="[a-z0-9_-]{2,40}" required /></div>
+            <div class="field"><label for="s-name">이름</label><input type="text" id="s-name" required /></div>
+          </div>
+          <button type="submit" class="btn btn-small" style="justify-self:start">등록</button>
+        </form>
+        <div id="seller-message"></div>
+      </div>
+
+      <div class="portal-card">
+        <h2>구매 요청 승인</h2>
+        <div class="portal-table-wrap">
+          <table class="portal-table">
+            <thead><tr><th>판매처</th><th>요청일</th><th>수량</th><th>액션</th></tr></thead>
+            <tbody id="request-list"><tr><td colspan="4" class="portal-empty">대기 중인 요청이 없습니다.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <h2>접근 링크 관리</h2>
+        <form id="link-form" class="portal-form">
+          <div class="form-row">
+            <div class="field">
+              <label for="link-role">역할</label>
+              <select id="link-role">
+                <option value="A">A — 보라카이션 관리자</option>
+                <option value="B">B — 판매처</option>
+                <option value="C">C — 리버타드 현장</option>
+              </select>
+            </div>
+            <div class="field" id="link-seller-field">
+              <label for="link-seller">판매처</label>
+              <select id="link-seller"></select>
+            </div>
+            <div class="field"><label for="link-label">메모</label><input type="text" id="link-label" placeholder="예: 보자무싸 담당자" /></div>
+          </div>
+          <button type="submit" class="btn btn-small" style="justify-self:start">링크 생성</button>
+        </form>
+        <div id="link-message"></div>
+        <div class="portal-table-wrap" style="margin-top:16px">
+          <table class="portal-table">
+            <thead><tr><th>역할</th><th>대상</th><th>메모</th><th>상태</th><th>액션</th></tr></thead>
+            <tbody id="link-list"><tr><td colspan="5" class="portal-empty">불러오는 중...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="portal-card">
+        <h2>체크인 / 취소 로그</h2>
+        <div class="portal-table-wrap">
+          <table class="portal-table">
+            <thead><tr><th>시간</th><th>결과</th><th>사유</th><th>장소</th></tr></thead>
+            <tbody id="log-list"><tr><td colspan="4" class="portal-empty">기록이 없습니다.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script type="module">
+import { requireAccess, signOutAccess } from "./js/ticket-access.js";
+import { db, functions } from "./js/firebase-config.js";
+import { collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+const createSellerFn = httpsCallable(functions, "createSeller");
+const allocateTicketsFn = httpsCallable(functions, "allocateTickets");
+const resolvePurchaseRequestFn = httpsCallable(functions, "resolvePurchaseRequest");
+const createAccessLinkFn = httpsCallable(functions, "createAccessLink");
+const revokeAccessLinkFn = httpsCallable(functions, "revokeAccessLink");
+const listAccessLinksFn = httpsCallable(functions, "listAccessLinks");
+
+let sellersCache = new Map();
+
+function fmtDate(ts) {
+  if (!ts) return "-";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString("ko-KR");
+}
+
+function closeModal() { document.getElementById("modal-root").innerHTML = ""; }
+
+function showLinkModal(url) {
+  const root = document.getElementById("modal-root");
+  root.innerHTML = `
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal-box">
+        <h2>접근 링크 생성됨</h2>
+        <p class="portal-subtitle">이 링크는 다시 확인할 수 없습니다. 지금 복사해서 전달하세요.</p>
+        <div class="link-row"><code>${url}</code></div>
+        <div class="modal-close-row"><button class="btn btn-small" id="btn-close">닫기</button></div>
+      </div>
+    </div>
+  `;
+  document.getElementById("btn-close").addEventListener("click", closeModal);
+  document.getElementById("modal-overlay").addEventListener("click", (e) => {
+    if (e.target.id === "modal-overlay") closeModal();
+  });
+}
+
+// ── 판매처별 현황 (실시간) ──
+function renderSellers() {
+  const listEl = document.getElementById("seller-list");
+  const linkSellerSelect = document.getElementById("link-seller");
+
+  if (sellersCache.size === 0) {
+    listEl.innerHTML = `<tr><td colspan="6" class="portal-empty">등록된 판매처가 없습니다.</td></tr>`;
+    linkSellerSelect.innerHTML = "";
+    return;
+  }
+
+  const totals = { allocatedTotal: 0, remaining: 0, usedCount: 0, cancelledCount: 0 };
+  const rows = [];
+  for (const [id, s] of sellersCache) {
+    const remaining = s.allocatedTotal - s.consumedCount;
+    totals.allocatedTotal += s.allocatedTotal;
+    totals.remaining += remaining;
+    totals.usedCount += s.usedCount;
+    totals.cancelledCount += s.cancelledCount;
+    rows.push(`<tr>
+      <td>${s.name}</td>
+      <td>${s.allocatedTotal}</td>
+      <td>${remaining}</td>
+      <td>${s.usedCount}</td>
+      <td>${s.cancelledCount}</td>
+      <td><button class="btn btn-ghost btn-small" data-action="allocate" data-id="${id}">배정 조정</button></td>
+    </tr>`);
+  }
+  listEl.innerHTML = rows.join("");
+
+  document.getElementById("t-allocated").textContent = totals.allocatedTotal;
+  document.getElementById("t-remaining").textContent = totals.remaining;
+  document.getElementById("t-used").textContent = totals.usedCount;
+  document.getElementById("t-cancelled").textContent = totals.cancelledCount;
+
+  linkSellerSelect.innerHTML = [...sellersCache.entries()]
+    .map(([id, s]) => `<option value="${id}">${s.name}</option>`)
+    .join("");
+}
+
+document.getElementById("seller-list").addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-action='allocate']");
+  if (!btn) return;
+  const seller = sellersCache.get(btn.dataset.id);
+  const input = prompt(`${seller.name}의 배정 수량을 얼마나 조정할까요? (증가는 양수, 감소는 음수)`, "10");
+  if (input === null) return;
+  const delta = Number(input);
+  if (!Number.isInteger(delta) || delta === 0) return;
+  try {
+    await allocateTicketsFn({ sellerId: btn.dataset.id, delta });
+  } catch (err) {
+    alert(err.message || "배정 조정 중 오류가 발생했습니다.");
+  }
+});
+
+// ── 새 판매처 등록 ──
+document.getElementById("seller-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msgEl = document.getElementById("seller-message");
+  msgEl.innerHTML = "";
+  try {
+    await createSellerFn({
+      sellerId: document.getElementById("s-id").value.trim(),
+      name: document.getElementById("s-name").value.trim(),
+    });
+    msgEl.innerHTML = `<p class="portal-message success">판매처가 등록되었습니다.</p>`;
+    e.target.reset();
+  } catch (err) {
+    msgEl.innerHTML = `<p class="portal-message error">${err.message || "등록 중 오류가 발생했습니다."}</p>`;
+  }
+});
+
+// ── 구매 요청 ──
+function renderRequests(snapshot) {
+  const listEl = document.getElementById("request-list");
+  if (snapshot.empty) {
+    listEl.innerHTML = `<tr><td colspan="4" class="portal-empty">대기 중인 요청이 없습니다.</td></tr>`;
+    return;
+  }
+  const rows = [];
+  snapshot.forEach((docSnap) => {
+    const r = docSnap.data();
+    const sellerName = sellersCache.get(r.sellerId)?.name || r.sellerId;
+    rows.push(`<tr>
+      <td>${sellerName}</td>
+      <td>${fmtDate(r.requestedAt)}</td>
+      <td>${r.requestedQty}장</td>
+      <td>
+        <button class="btn btn-small" data-action="approve" data-id="${docSnap.id}">승인</button>
+        <button class="btn btn-danger btn-small" data-action="reject" data-id="${docSnap.id}">거절</button>
+      </td>
+    </tr>`);
+  });
+  listEl.innerHTML = rows.join("");
+}
+
+document.getElementById("request-list").addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+  try {
+    await resolvePurchaseRequestFn({ requestId: btn.dataset.id, approve: btn.dataset.action === "approve" });
+  } catch (err) {
+    alert(err.message || "처리 중 오류가 발생했습니다.");
+  }
+});
+
+// ── 접근 링크 ──
+document.getElementById("link-role").addEventListener("change", (e) => {
+  document.getElementById("link-seller-field").style.display = e.target.value === "B" ? "flex" : "none";
+});
+document.getElementById("link-seller-field").style.display = "none";
+
+async function refreshLinks() {
+  const listEl = document.getElementById("link-list");
+  try {
+    const { data } = await listAccessLinksFn();
+    if (data.links.length === 0) {
+      listEl.innerHTML = `<tr><td colspan="5" class="portal-empty">발급된 링크가 없습니다.</td></tr>`;
+      return;
+    }
+    listEl.innerHTML = data.links
+      .map((l) => {
+        const target = l.role === "B" ? (sellersCache.get(l.sellerId)?.name || l.sellerId) : "-";
+        const status = l.revoked
+          ? `<span class="badge badge-cancelled">해지됨</span>`
+          : `<span class="badge badge-issued">활성</span>`;
+        const action = l.revoked
+          ? "-"
+          : `<button class="btn btn-danger btn-small" data-hash="${l.hash}">해지</button>`;
+        return `<tr><td>${l.role}</td><td>${target}</td><td>${l.label || "-"}</td><td>${status}</td><td>${action}</td></tr>`;
+      })
+      .join("");
+  } catch (err) {
+    listEl.innerHTML = `<tr><td colspan="5" class="portal-empty">불러오지 못했습니다.</td></tr>`;
+  }
+}
+
+document.getElementById("link-list").addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-hash]");
+  if (!btn) return;
+  if (!confirm("이 링크를 해지할까요? 이미 로그인된 세션도 곧 만료됩니다.")) return;
+  try {
+    await revokeAccessLinkFn({ hash: btn.dataset.hash });
+    refreshLinks();
+  } catch (err) {
+    alert(err.message || "해지 중 오류가 발생했습니다.");
+  }
+});
+
+document.getElementById("link-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msgEl = document.getElementById("link-message");
+  msgEl.innerHTML = "";
+  const role = document.getElementById("link-role").value;
+  const sellerId = role === "B" ? document.getElementById("link-seller").value : undefined;
+  const label = document.getElementById("link-label").value.trim();
+
+  const pageByRole = { A: "ticket-admin.html", B: "ticket-seller.html", C: "ticket-counter.html" };
+
+  try {
+    const { data } = await createAccessLinkFn({ role, sellerId, label });
+    const url = new URL(`${pageByRole[role]}?t=${data.token}`, window.location.href).href;
+    e.target.reset();
+    document.getElementById("link-seller-field").style.display = "none";
+    showLinkModal(url);
+    refreshLinks();
+  } catch (err) {
+    msgEl.innerHTML = `<p class="portal-message error">${err.message || "링크 생성 중 오류가 발생했습니다."}</p>`;
+  }
+});
+
+// ── 체크인 로그 ──
+function renderLogs(snapshot) {
+  const listEl = document.getElementById("log-list");
+  if (snapshot.empty) {
+    listEl.innerHTML = `<tr><td colspan="4" class="portal-empty">기록이 없습니다.</td></tr>`;
+    return;
+  }
+  const rows = [];
+  snapshot.forEach((docSnap) => {
+    const l = docSnap.data();
+    const badge = l.result === "OK" ? "badge-used" : "badge-cancelled";
+    rows.push(`<tr>
+      <td>${fmtDate(l.checkedAt)}</td>
+      <td><span class="badge ${badge}">${l.result}</span></td>
+      <td>${l.reason || "-"}</td>
+      <td>${l.checkLocation || "-"}</td>
+    </tr>`);
+  });
+  listEl.innerHTML = rows.join("");
+}
+
+function initListeners() {
+  onSnapshot(collection(db, "sellers"), (snapshot) => {
+    sellersCache = new Map();
+    snapshot.forEach((docSnap) => sellersCache.set(docSnap.id, docSnap.data()));
+    renderSellers();
+    refreshLinks();
+  });
+
+  onSnapshot(query(collection(db, "purchaseRequests"), where("status", "==", "pending")), renderRequests);
+
+  onSnapshot(query(collection(db, "checkinLogs"), orderBy("checkedAt", "desc"), limit(50)), renderLogs);
+}
+
+requireAccess("A")
+  .then(() => {
+    document.getElementById("admin-app").style.display = "block";
+    document.getElementById("btn-signout").style.display = "inline-flex";
+    initListeners();
+  })
+  .catch(() => {
+    document.getElementById("access-denied").style.display = "block";
+  });
+
+document.getElementById("btn-signout").addEventListener("click", () => {
+  signOutAccess().then(() => window.location.reload());
+});
+</script>
+</body>
+</html>
