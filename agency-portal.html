@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>에이전시 포털 — Boracay Whale Shark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/portal.css?v=6" />
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+</head>
+<body class="pt-body">
+
+<div id="login-view" class="pt-login-wrap">
+  <div class="pt-card">
+    <h2>에이전시 로그인</h2>
+    <p>보라카이션 관리자가 등록해준 이메일/비밀번호로 로그인하세요.</p>
+    <form id="login-form" class="pt-form">
+      <div class="pt-field"><label>이메일</label><input class="pt-input" type="email" id="login-email" required /></div>
+      <div class="pt-field"><label>비밀번호</label><input class="pt-input" type="password" id="login-password" required /></div>
+      <div id="login-message"></div>
+      <button type="submit" class="pt-btn pt-btn-secondary" style="justify-self:start;">로그인</button>
+    </form>
+  </div>
+</div>
+
+<div id="portal-view" class="pt-app" style="display:none;">
+
+  <header class="pt-header">
+    <span class="pt-header-brand" id="header-brand">🐋 BORACATION B2B</span>
+    <span class="pt-header-account"><span id="agency-name-title">Agency</span><span class="caret">▾</span></span>
+  </header>
+
+  <div class="pt-layout">
+    <aside class="pt-sidebar">
+      <nav class="pt-nav" id="pt-nav">
+        <button class="pt-nav-item active" data-view="dashboard">Dashboard</button>
+        <button class="pt-nav-item pt-nav-cta" data-view="reservation">+ New Reservation</button>
+        <button class="pt-nav-item" data-view="reservations">Reservations</button>
+        <button class="pt-nav-item" data-view="deposit">Deposit</button>
+        <button class="pt-nav-item" data-view="transactions">Transactions</button>
+      </nav>
+      <button class="pt-sidebar-signout" id="btn-signout">로그아웃</button>
+    </aside>
+
+    <main class="pt-main">
+
+      <!-- DASHBOARD -->
+      <section id="view-dashboard" class="pt-view active">
+        <h1 class="pt-greeting">Good morning, <span id="greeting-name">Partner</span></h1>
+        <div class="pt-stats-grid">
+          <div class="pt-stat-card accent"><span class="value" id="stat-balance">-</span><span class="label">Balance</span></div>
+          <div class="pt-stat-card"><span class="value" id="stat-today">-</span><span class="label">Today</span></div>
+          <div class="pt-stat-card"><span class="value" id="stat-upcoming">-</span><span class="label">Upcoming</span></div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="pt-btn" id="btn-goto-reservation">+ NEW RESERVATION</button>
+          <button class="pt-btn pt-btn-secondary" id="btn-goto-deposit">+ DEPOSIT</button>
+        </div>
+        <h2 class="pt-section-title">Recent Reservations</h2>
+        <div id="recent-list"><p class="pt-empty">예약 내역이 없습니다.</p></div>
+      </section>
+
+      <!-- NEW RESERVATION -->
+      <section id="view-reservation" class="pt-view">
+        <h1 class="pt-greeting">New Reservation</h1>
+        <div class="pt-card">
+          <form id="booking-form" class="pt-form">
+            <div class="pt-field" id="tour-type-field">
+              <label>투어 종류</label>
+              <div class="pt-pill-row" id="tour-pills">
+                <button type="button" class="pt-pill" data-tour="VF">VIP 패스트트랙</button>
+                <button type="button" class="pt-pill" data-tour="F">패스트트랙</button>
+                <button type="button" class="pt-pill active" data-tour="R">레귤러 고래상어투어</button>
+                <button type="button" class="pt-pill" data-tour="T">고래상어 티켓만</button>
+              </div>
+              <input type="hidden" id="b-tour" value="R" />
+              <p id="ticket-only-note" style="display:none; color:#dc2626; font-size:0.8rem; font-weight:700; margin:8px 0 0;">Entrance fee / Environmental Fee / Transportation 포함</p>
+              <p id="pickup-note" style="color:var(--pt-muted); font-size:0.8rem; margin:8px 0 0;">픽업/미팅 장소: 메인로드 졸리비 (Jollibee Main Road)</p>
+            </div>
+            <div class="pt-field" id="meeting-time-field" style="display:none;">
+              <label>미팅 시간</label>
+              <div class="pt-pill-row" id="meeting-time-pills">
+                <button type="button" class="pt-pill active" data-time="07:30">오전 07:30</button>
+                <button type="button" class="pt-pill" data-time="09:00">오전 09:00</button>
+              </div>
+              <p id="meeting-fixed-note" style="display:none; color:var(--pt-muted); font-size:0.8rem; margin:8px 0 0;">미팅 시간: 오전 07:30 (고정)</p>
+              <input type="hidden" id="b-meeting-time" value="07:30" />
+            </div>
+            <div class="pt-field" id="addon-field">
+              <label>추가 옵션</label>
+              <div class="pt-pill-row" id="addon-pills">
+                <button type="button" class="pt-pill pt-pill-checkbox" data-addon="H">☐ 조인 호핑투어</button>
+                <button type="button" class="pt-pill pt-pill-checkbox" data-addon="HG">☐ 단독 호핑투어</button>
+                <button type="button" class="pt-pill pt-pill-checkbox" data-addon="L">☐ 랜드투어</button>
+              </div>
+              <div class="pt-row" id="addon-date-row" style="margin-top:12px; display:none;">
+                <div class="pt-field" id="addon-date-field-H" style="display:none;">
+                  <label>조인 호핑투어 날짜</label>
+                  <input class="pt-input" type="date" id="addon-date-H" />
+                </div>
+                <div class="pt-field" id="addon-date-field-L" style="display:none;">
+                  <label>랜드투어 날짜</label>
+                  <input class="pt-input" type="date" id="addon-date-L" />
+                </div>
+              </div>
+              <div class="pt-field" id="group-guests-field" style="display:none; margin-top:12px;">
+                <label>GUESTS (단독 호핑투어 그룹 인원 — 티켓 할인 포함가)</label>
+                <div class="pt-pill-row" id="group-size-pills">
+                  <button type="button" class="pt-pill" data-size="10">10 pax · ₱25,000</button>
+                  <button type="button" class="pt-pill" data-size="20">20 pax · ₱30,000</button>
+                  <button type="button" class="pt-pill" data-size="30">30 pax · ₱40,000</button>
+                  <button type="button" class="pt-pill" data-size="40">40 pax · ₱45,000</button>
+                </div>
+                <div class="pt-field" style="margin-top:12px;">
+                  <label>단독 호핑투어 날짜</label>
+                  <input class="pt-input" type="date" id="addon-date-HG" />
+                </div>
+              </div>
+            </div>
+            <div class="pt-field" id="nationality-field">
+              <label>고객 유형</label>
+              <div class="pt-pill-row" id="nationality-pills">
+                <button type="button" class="pt-pill active" data-nationality="PH">현지인</button>
+                <button type="button" class="pt-pill" data-nationality="CN">중국인</button>
+                <button type="button" class="pt-pill" data-nationality="KR">한국인</button>
+                <button type="button" class="pt-pill" data-nationality="FOREIGN">외국인</button>
+              </div>
+              <input type="hidden" id="b-nationality" value="PH" />
+            </div>
+            <div class="pt-field"><label>투어일</label><input class="pt-input" type="date" id="b-date" required /></div>
+            <div class="pt-row" id="individual-guests-field">
+              <div class="pt-field">
+                <label>성인</label>
+                <div class="pt-stepper">
+                  <button type="button" class="pt-stepper-btn" data-step="adult" data-delta="-1">−</button>
+                  <span class="pt-stepper-value" id="b-adults-display">2</span>
+                  <button type="button" class="pt-stepper-btn" data-step="adult" data-delta="1">+</button>
+                </div>
+              </div>
+              <div class="pt-field">
+                <label>아동</label>
+                <div class="pt-stepper">
+                  <button type="button" class="pt-stepper-btn" data-step="child" data-delta="-1">−</button>
+                  <span class="pt-stepper-value" id="b-children-display">0</span>
+                  <button type="button" class="pt-stepper-btn" data-step="child" data-delta="1">+</button>
+                </div>
+              </div>
+            </div>
+            <div class="pt-field">
+              <label>Payment Method</label>
+              <div class="pt-pill-row" id="pay-pills">
+                <button type="button" class="pt-pill active" data-pay="deposit">Deposit</button>
+                <button type="button" class="pt-pill" data-pay="cash_office">보라카이션 오피스페이</button>
+              </div>
+              <input type="hidden" id="b-pay" value="deposit" />
+            </div>
+            <div id="price-breakdown" class="pt-breakdown"></div>
+            <div class="pt-total-row">
+              <span class="pt-total-label">예상 금액</span>
+              <span class="pt-total-value" id="b-total">-</span>
+            </div>
+            <div id="booking-message"></div>
+            <button type="submit" class="pt-btn" style="justify-self:start;">예약 확정</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- RESERVATIONS (전체 목록) -->
+      <section id="view-reservations" class="pt-view">
+        <h1 class="pt-greeting">Reservations</h1>
+        <div id="all-list"><p class="pt-empty">예약 내역이 없습니다.</p></div>
+      </section>
+
+      <!-- DEPOSIT (원장) -->
+      <section id="view-deposit" class="pt-view">
+        <h1 class="pt-greeting">Deposit</h1>
+        <div class="pt-stats-grid">
+          <div class="pt-stat-card accent"><span class="value" id="stat-balance-2">-</span><span class="label">Current Balance</span></div>
+        </div>
+
+        <div class="pt-card">
+          <h2 style="margin-top:0;">입금 신청 (GCash)</h2>
+          <p style="margin-bottom:16px;">아래 GCash로 입금 후, 입금하신 날짜와 입금자명을 정확히 기입해 신청해주세요. 관리자가 확인하고 잔액에 반영합니다.</p>
+
+          <div class="pt-gcash-box">
+            <img src="assets/gcash-logo.svg" alt="GCash" class="pt-gcash-logo" loading="lazy">
+            <img src="assets/gcash-qr.jpg" alt="GCash QR" class="pt-gcash-qr">
+            <p class="pt-gcash-caption">GCash: +63 967 466 7943</p>
+          </div>
+
+          <form id="deposit-request-form" class="pt-form">
+            <div class="pt-field"><label>입금액 (PHP)</label><input class="pt-input" type="number" id="dr-amount" min="1" step="1" required /></div>
+            <div class="pt-row">
+              <div class="pt-field"><label>입금 날짜 *</label><input class="pt-input" type="date" id="dr-date" required /></div>
+              <div class="pt-field"><label>입금자 이름 *</label><input class="pt-input" type="text" id="dr-name" placeholder="GCash에 뜨는 이름" required /></div>
+            </div>
+            <div id="deposit-request-message"></div>
+            <button type="submit" class="pt-btn" style="justify-self:start;">입금 신청하기</button>
+          </form>
+        </div>
+
+        <h2 class="pt-section-title">신청 내역</h2>
+        <div id="deposit-request-list"><p class="pt-empty">신청 내역이 없습니다.</p></div>
+      </section>
+
+      <!-- TRANSACTIONS (원장) -->
+      <section id="view-transactions" class="pt-view">
+        <h1 class="pt-greeting">Transactions</h1>
+        <div id="tx-list"><p class="pt-empty">거래 내역이 없습니다.</p></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script type="module" src="js/agency-portal.js?v=21"></script>
+</body>
+</html>

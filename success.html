@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>예약 완료 | Boracay Whale Shark</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body {
+    background: #020617;
+    color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .success-container {
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 60px 40px;
+    border-radius: 30px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  @keyframes slideUp {
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .icon-wrapper {
+    width: 100px;
+    height: 100px;
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px auto;
+    color: #10b981;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+    animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s forwards;
+    transform: scale(0);
+  }
+  @keyframes popIn {
+    to { transform: scale(1); }
+  }
+  .success-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .success-desc {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    word-break: keep-all;
+  }
+  .home-btn {
+    display: inline-block;
+    background: #3b82f6;
+    color: #fff;
+    padding: 16px 40px;
+    border-radius: 99px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+    transition: all 0.3s ease;
+  }
+  .home-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 15px 25px rgba(59, 130, 246, 0.6);
+    transform: translateY(-2px);
+  }
+  .success-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .kakao-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #FEE500;
+    color: #3C1E1E;
+    padding: 16px 40px;
+    border-radius: 99px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 20px rgba(254, 229, 0, 0.3);
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 320px;
+    box-sizing: border-box;
+  }
+  .kakao-btn:hover {
+    box-shadow: 0 15px 25px rgba(254, 229, 0, 0.5);
+    transform: translateY(-2px);
+  }
+  .kakao-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+</style>
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<div class="success-container">
+  <div class="icon-wrapper">
+    <i data-lucide="check" style="width: 50px; height: 50px; stroke-width: 3px;"></i>
+  </div>
+  <h1 class="success-title" data-en="Payment &amp; Reservation Confirmed!" data-ko="결제 및 예약이 확정되었습니다!">Payment & Reservation Confirmed!</h1>
+  <p class="success-desc" data-en="Your payment has been successfully processed,<br>and your reservation is securely confirmed.<br><br>Our representative will send you the confirmation voucher via email shortly." data-ko="결제가 성공적으로 처리되었으며,<br>예약이 안전하게 확정되었습니다.<br><br>담당자가 곧 이메일로 예약 확정 바우처를 보내드립니다.">
+    Your payment has been successfully processed,<br>and your reservation is securely confirmed.<br><br>
+    Our representative will send you the confirmation voucher via email shortly.
+  </p>
+  <div class="success-actions">
+    <a href="https://open.kakao.com/o/s0qOPfJi" target="_blank" rel="noopener" class="kakao-btn" id="kakao-btn" style="display:none;"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.125 0H1.875C.8394 0 0 .8394 0 1.875v20.25C0 23.1606.8394 24 1.875 24h20.25C23.1606 24 24 23.1606 24 22.125V1.875C24 .8394 23.1606 0 22.125 0zM12 18.75c-.591 0-1.1697-.0413-1.7317-.1209-.5626.3965-3.813 2.6797-4.1198 2.7225 0 0-.1258.0489-.2328-.0141s-.0876-.2282-.0876-.2282c.0322-.2198.8426-3.0183.992-3.5333-2.7452-1.36-4.5701-3.7686-4.5701-6.5135C2.25 6.8168 6.6152 3.375 12 3.375s9.75 3.4418 9.75 7.6875c0 4.2457-4.3652 7.6875-9.75 7.6875zM8.0496 9.8672h-.8777v3.3417c0 .2963-.2523.5372-.5625.5372s-.5625-.2409-.5625-.5372V9.8672h-.8777c-.3044 0-.552-.2471-.552-.5508s.2477-.5508.552-.5508h2.8804c.3044 0 .552.2471.552.5508s-.2477.5508-.552.5508zm10.9879 2.9566a.558.558 0 0 1 .108.4167.5588.5588 0 0 1-.2183.371.5572.5572 0 0 1-.3383.1135.558.558 0 0 1-.4493-.2236l-1.3192-1.7479-.1952.1952v1.2273a.5635.5635 0 0 1-.5627.5628.563.563 0 0 1-.5625-.5625V9.3281c0-.3102.2523-.5625.5625-.5625s.5625.2523.5625.5625v1.209l1.5694-1.5694c.0807-.0807.1916-.1252.312-.1252.1404 0 .2814.0606.3871.1661.0985.0984.1573.2251.1654.3566.0082.1327-.036.2542-.1241.3425l-1.2818 1.2817 1.3845 1.8344zm-8.3502-3.5023c-.095-.2699-.3829-.5475-.7503-.5557-.3663.0083-.6542.2858-.749.5551l-1.3455 3.5415c-.1708.5305-.0217.7272.1333.7988a.8568.8568 0 0 0 .3576.0776c.2346 0 .4139-.0952.4678-.2481l.2787-.7297 1.7152.0001.2785.7292c.0541.1532.2335.2484.4681.2484a.8601.8601 0 0 0 .3576-.0775c.1551-.0713.3041-.2681.1329-.7999l-1.3449-3.5398zm-1.3116 2.4433l.5618-1.5961.5618 1.5961H9.3757zm5.9056 1.3836c0 .2843-.2418.5156-.5391.5156h-1.8047c-.2973 0-.5391-.2314-.5391-.5156V9.3281c0-.3102.2576-.5625.5742-.5625s.5742.2523.5742.5625v3.3047h1.1953c.2974 0 .5392.2314.5392.5156z"/></svg><span data-en="Chat with Us on KakaoTalk" data-ko="카카오 오픈채팅방 바로가기">Chat with Us on KakaoTalk</span></a>
+    <a href="./" class="home-btn" data-en="Return to Home" data-ko="홈으로 돌아가기">Return to Home</a>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  const lang = localStorage.getItem('ws_lang') || 'en';
+  if (lang === 'ko') {
+    document.querySelectorAll('[data-en][data-ko]').forEach(el => {
+      el.innerHTML = el.getAttribute('data-ko');
+    });
+    document.documentElement.lang = 'ko';
+  }
+
+  // KakaoTalk is only relevant to foreign (non-Philippine) customers
+  const nationality = new URLSearchParams(window.location.search).get('nationality');
+  if (nationality === 'FOREIGN') {
+    document.getElementById('kakao-btn').style.display = 'inline-flex';
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>리버타드 체크인 — Boracay Whale Shark</title>
+<link rel="stylesheet" href="css/ticket-portal.css?v=1" />
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+<div id="login-view" class="portal-body">
+  <div class="portal-shell" style="max-width:420px;">
+    <div class="portal-card">
+      <h2 style="margin-top:0;">리버타드 체크인 로그인</h2>
+      <form id="login-form" class="portal-form">
+        <div class="field"><label>이메일</label><input type="email" id="login-email" required /></div>
+        <div class="field"><label>비밀번호</label><input type="password" id="login-password" required /></div>
+        <div id="login-message"></div>
+        <button type="submit" class="btn" style="justify-self:start;">로그인</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="check-screen" class="check-screen" style="display:none;">
+  <div class="check-card" id="check-card">
+    <p class="check-eyebrow">WHALE SHARK TICKET</p>
+    <h1>QR 스캔 대기 중</h1>
+    <div id="qr-reader" style="margin: 16px 0;"></div>
+    <div id="check-body"></div>
+    <div class="modal-close-row" style="margin-top:16px;">
+      <button class="btn btn-ghost btn-small" id="btn-today-summary">오늘 현황</button>
+      <button class="btn btn-ghost btn-small" id="btn-signout">로그아웃</button>
+    </div>
+  </div>
+</div>
+
+<div id="summary-overlay" class="check-screen" style="display:none;">
+  <div class="check-card" id="summary-card">
+    <p class="check-eyebrow">TODAY'S CHECK-INS</p>
+    <h1>오늘 체크인 현황</h1>
+    <div id="summary-total" style="font-size:2.2rem; font-weight:800; margin:12px 0;">-</div>
+    <div id="summary-body"></div>
+    <div class="modal-close-row" style="margin-top:16px;">
+      <button class="btn btn-small" id="btn-summary-close">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/checkin.js?v=4"></script>
+</body>
+</html>

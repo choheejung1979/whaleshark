@@ -1,0 +1,183 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------------
+    // 공용 권한 헬퍼. 이 프로젝트에는 Cloud Functions가 없으므로 (Firebase
+    // 무료 Spark 요금제 유지) 역할은 전부 "누구 계정으로 로그인했는가"로만
+    // 판단합니다 — admin.html은 luca@ 계정, 리버타드 체크인 담당은 checkin@
+    // 계정. 두 계정 모두 관리자가 Firebase 콘솔/보조 앱 인스턴스로 직접
+    // 발급하고 신뢰할 수 있는 사람에게만 전달합니다.
+    // ---------------------------------------------------------------
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'luca@boracaywhaleshark.com';
+    }
+    function isLibertadStaff() {
+      return request.auth != null && request.auth.token.email == 'checkin@boracaywhaleshark.com';
+    }
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    // 트랜잭션/배치 안의 다른 문서는 커밋 "이전" 상태로만 읽히므로, 같은
+    // 요청에서 새로 만드는 문서를 get()으로 검증하는 것은 애초에 불가능합니다
+    // (그 문서가 아직 존재하지 않는 것으로 보임). 그래서 예약 생성과 잔액
+    // 차감을 한 번에 묶지 않고, 아래 두 단계로 나눕니다:
+    //   1) 예약 생성 — 그 시점의 잔액이 충분한지만 확인 (get으로 기존 문서 조회)
+    //   2) 잔액 차감 — 방금 만든(이미 커밋된) 예약의 totalPrice를 get으로
+    //      다시 읽어 정확히 그만큼만 차감하고, 그 예약에 depositApplied=true
+    //      플래그를 같은 트랜잭션으로 남겨 같은 예약을 두 번 차감하지 못하게 막음.
+    // 두 단계 사이에 클라이언트가 중간에 멈추면(네트워크 끊김 등) 잔액 차감
+    // 없이 예약만 남는 경우가 이론상 있을 수 있어, admin.html의 에이전시
+    // 화면에서 depositApplied == false 인 예약을 "정산 필요"로 표시해 관리자가
+    // 육안으로 잡아낼 수 있게 합니다 — Cloud Function 없이 감당 가능한
+    // 수준의 잔여 리스크로 판단했습니다.
+    function reservationRef(id) {
+      return get(/databases/$(database)/documents/reservations/$(id)).data;
+    }
+    function agencyRef(uid) {
+      return get(/databases/$(database)/documents/agencies/$(uid)).data;
+    }
+
+    // 여행사 파트너(B2B) 계정. uid = 해당 파트너의 Firebase Auth UID.
+    match /agencies/{uid} {
+      // 리버타드 체크인 담당은 checkin.html의 "오늘 현황" 요약에서 어느
+      // 업체(B2B 파트너) 예약인지 이름을 보여주기 위해 읽기 권한이 필요합니다.
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == uid) || isLibertadStaff();
+
+      // 관리자: 입금 반영 등 자유롭게 수정 가능.
+      allow update: if isAdmin();
+
+      // 파트너 본인: 자기 예약(reservations/{id}) 중 아직 차감 안 된 것 하나를
+      // 골라, 그 예약의 totalPrice만큼만 정확히 잔액을 차감. lastPurchaseRef는
+      // "마지막으로 차감에 쓰인 예약 ID"를 남겨두는 감사용 필드입니다 — 그
+      // 필드와 depositBalance 외에는 바꿀 수 없고, 잔액이 음수가 되는 것도
+      // 막습니다.
+      allow update: if isSignedIn() && request.auth.uid == uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['depositBalance', 'lastPurchaseRef']) &&
+        request.resource.data.depositBalance is number &&
+        request.resource.data.depositBalance >= 0 &&
+        request.resource.data.lastPurchaseRef is string &&
+        reservationRef(request.resource.data.lastPurchaseRef).agencyId == uid &&
+        reservationRef(request.resource.data.lastPurchaseRef).depositApplied == false &&
+        request.resource.data.depositBalance == resource.data.depositBalance - reservationRef(request.resource.data.lastPurchaseRef).totalPrice;
+
+      // 관리자가 신규 에이전시를 등록할 때 (admin.html) 생성.
+      allow create: if isAdmin();
+    }
+
+    // 파트너 예치금 입출금 원장. 관리자가 입금을 반영할 때, 그리고 파트너가
+    // 예약을 만들 때 각각 자기 몫만 기록합니다.
+    match /agencyTransactions/{txId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.agencyId == request.auth.uid);
+      allow create: if isAdmin() ||
+        (isSignedIn() && request.resource.data.agencyId == request.auth.uid &&
+         request.resource.data.type == 'purchase' && request.resource.data.amount < 0);
+      allow update, delete: if false;
+    }
+
+    // 파트너가 예치금 입금을 신청하면(실제 송금은 별도로, 계좌이체 등)
+    // 관리자가 admin.html에서 확인하고 승인/거절합니다. 승인 시 admin.html이
+    // agencies의 depositBalance를 직접 올리고 agencyTransactions에
+    // type:'topup' 기록을 남깁니다 (이미 admin.html이 하던 방식 그대로).
+    match /depositRequests/{reqId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.agencyId == request.auth.uid);
+      allow create: if isSignedIn() &&
+        request.resource.data.agencyId == request.auth.uid &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.amount is number &&
+        request.resource.data.amount > 0;
+      allow update: if isAdmin() &&
+        resource.data.status == 'pending' &&
+        request.resource.data.status in ['approved', 'rejected'];
+      allow delete: if false;
+    }
+
+    // 앱을 열어본 사람 전체가 대상인 방송 알림(고래상어 출몰 소식 등)을 위한
+    // Expo 푸시 토큰 저장소. 문서 ID를 토큰 값 자체로 써서, 로그인 여부와
+    // 상관없이(직접 고객은 로그인 안 함) 누구나 자기 토큰만 등록/갱신할 수
+    // 있게 하고, 읽기(=실제 발송)는 admin.html에서만 하도록 막습니다.
+    match /pushTokens/{token} {
+      allow read: if isAdmin();
+      allow create, update: if
+        request.resource.data.token == token &&
+        request.resource.data.token is string &&
+        request.resource.data.keys().hasOnly(['token', 'platform', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    // 앱 홈 화면 히어로 영상 아래에 보여주는 "오늘 고래상어 투어 운영 여부"
+    // 배너. 문서 하나(tourStatus)만 계속 덮어써서 씁니다 — 날짜별 기록이
+    // 필요한 게 아니라 "지금 상태"만 보여주면 되기 때문입니다. 누구나 읽을
+    // 수 있어야 앱에서(로그인 없이) 바로 보여줄 수 있고, 쓰기는 관리자만.
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /reservations/{reservationId} {
+      // 직접 고객 예약(reservation.html) — 기존 그대로.
+      allow create: if
+        request.resource.data.keys().hasAll(['tourType', 'date', 'people', 'name', 'email', 'status']) &&
+        request.resource.data.tourType is string &&
+        request.resource.data.name is string &&
+        request.resource.data.email is string &&
+        request.resource.data.people is number &&
+        request.resource.data.status == 'pending' &&
+        !request.resource.data.keys().hasAny(['bookedBy', 'agencyId']);
+
+      // 여행사 파트너(B2B) 예약 — 본인 agencyId로만 생성 가능.
+      // paymentMethod가 'deposit'이면 그 순간 잔액이 충분해야 하고 상태는
+      // 바로 'confirmed' (동시에 여러 건을 매우 빠르게 연달아 만드는 극단적인
+      // 경쟁 상태까지는 막지 못하지만, 실수/단순 위조는 막습니다).
+      // 'cash_office'면 잔액 확인 없이 만들 수 있고 상태는 'pending'(리버타드
+      // 현장에서 현금 결제 예정 — depositApplied는 애초에 차감할 일이 없으니
+      // 항상 true로 시작합니다).
+      allow create: if isSignedIn() &&
+        request.resource.data.bookedBy == 'agency' &&
+        request.resource.data.agencyId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['tourType', 'date', 'people', 'name', 'email', 'status', 'totalPrice', 'qrToken', 'checkedIn', 'depositApplied', 'paymentMethod']) &&
+        request.resource.data.totalPrice is number &&
+        request.resource.data.totalPrice > 0 &&
+        request.resource.data.checkedIn == false &&
+        (
+          (request.resource.data.paymentMethod == 'deposit' &&
+           request.resource.data.status == 'confirmed' &&
+           request.resource.data.depositApplied == false &&
+           agencyRef(request.auth.uid).depositBalance >= request.resource.data.totalPrice)
+          ||
+          (request.resource.data.paymentMethod == 'cash_office' &&
+           request.resource.data.status == 'pending' &&
+           request.resource.data.depositApplied == true)
+        );
+
+      // 파트너가 잔액 차감(위 agencies 업데이트)과 한 트랜잭션으로 자기
+      // 예약의 depositApplied를 true로 확정 — 같은 예약이 두 번 차감되는 것을
+      // 막는 역할입니다.
+      allow update: if isSignedIn() &&
+        resource.data.get('agencyId', '') == request.auth.uid &&
+        resource.data.depositApplied == false &&
+        request.resource.data.depositApplied == true &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['depositApplied']);
+
+      // 리버타드 체크인 담당: 미체크인 -> 체크인 상태로만, 그 필드들만 변경 가능.
+      allow update: if isLibertadStaff() &&
+        resource.data.checkedIn == false &&
+        request.resource.data.checkedIn == true &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['checkedIn', 'checkedInAt']);
+
+      // 관리자(admin.html)만 전체 조회/수정/삭제 가능.
+      allow read, update, delete: if isAdmin();
+
+      // 여행사 파트너는 자기 예약만 조회 가능.
+      allow read: if isSignedIn() && resource.data.get('agencyId', '') == request.auth.uid;
+
+      // 리버타드 체크인 담당은 qrToken이 발급된 예약만 조회 가능 — 여행사(B2B)
+      // 예약뿐 아니라, 결제 완료된 "티켓만" 직접 예약도 QR 체크인 대상이라
+      // 여기 포함됩니다. qrToken이 없는 일반 예약(R/F/VF)의 이름/이메일 등
+      // 개인정보는 볼 수 없습니다. 체크인 화면은 반드시 qrToken == 값 조건의
+      // 좁은 쿼리로만 조회합니다.
+      allow read: if isLibertadStaff() && resource.data.get('qrToken', '') != '';
+    }
+  }
+}
