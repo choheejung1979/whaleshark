@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>보라카이 고래상어 투어 예약 | 온라인 티켓 예약 – Boracay Whale Shark</title>
+<meta name="description" content="보라카이 고래상어 투어 온라인 예약 페이지입니다. 원하시는 날짜·인원·국적을 선택하고 온라인 결제를 완료하면 예약이 즉시 확정되며, 확정 바우처 또는 QR 티켓이 이메일로 바로 발송됩니다. 당일 예약도 가능하니 서둘러 신청해보세요.">
+<meta name="keywords" content="보라카이 고래상어 예약, 고래상어 투어 예약, 보라카이 투어 온라인 예약, 리버타드 티켓 예약, Boracay whale shark booking">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="보라카이 고래상어 투어 예약 | 온라인 티켓 예약">
+<meta property="og:description" content="날짜·투어 종류·인원 선택 후 즉시 티켓 발급. VIP Fast Track, Fast Track, Regular, 입장권 패키지. 한국어 안내, 당일 확정.">
+<meta property="og:image" content="https://boracaywhaleshark.com/assets/hero-bg.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://boracaywhaleshark.com/reservation">
+<meta property="og:site_name" content="Boracay Whale Shark">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://boracaywhaleshark.com/reservation">
+
+<link rel="stylesheet" href="css/style.css"> <!-- for nav -->
+<link rel="stylesheet" href="css/reservation.css?v=1788925195">
+<!-- Flatpickr (Premium Datepicker) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+<!-- Leaflet (Route Map) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+
+
+<!-- Header / Nav -->
+<header class="site-header" style="position:fixed; width:100%; z-index:50;">
+  <div class="container header-inner">
+    <a href="./" class="logo"><img src="assets/mwlogo.png" alt="Libertad Whale Shark" class="logo-img"><span class="logo-text">BORACAY WHALE SHARK</span></a>
+    <nav class="nav">
+      <a href="./" data-en="Home" data-ko="홈" data-zh="首页" data-ja="ホーム">Home</a>
+      <a href="./#comparison-section" data-en="Tours" data-ko="투어" data-zh="行程" data-ja="ツアー">Tours</a>
+      <div class="lang-select" id="lang-select">
+        <button class="lang-select-trigger" type="button" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color:#fff; padding: 6px 16px; border-radius:99px; font-size:1rem; font-weight:700; cursor:pointer;">🌐 <span class="lang-select-current">한국어</span></button>
+        <div class="lang-select-menu">
+          <a href="#" data-lang="ko">🇰🇷 한국어</a>
+          <a href="#" data-lang="en">🇺🇸 English</a>
+          <a href="#" data-lang="zh">🇨🇳 中文</a>
+          <a href="#" data-lang="ja">🇯🇵 日本語</a>
+        </div>
+      </div>
+      <a href="reservation" data-en="Book Now" data-ko="예약하기" data-zh="立即预订" data-ja="今すぐ予約">Book Now</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Background Video -->
+<iframe class="res-bg-video" src="https://www.youtube.com/embed/GnC-jWDaqgY?autoplay=1&mute=1&loop=1&playlist=GnC-jWDaqgY&controls=0&showinfo=0&rel=0&playsinline=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<!-- Overlay -->
+<div class="res-overlay"></div>
+
+<div class="wizard-page">
+
+  <div class="wizard-hero">
+    <span class="res-badge" id="dyn-badge" data-en="RESERVATION EXPERIENCE" data-ko="예약 안내" data-zh="预约须知" data-ja="ご予約について">RESERVATION EXPERIENCE</span>
+    <h1 class="wizard-hero-title" id="dyn-title">SECURE YOUR TOUR</h1>
+    <p class="wizard-hero-desc" id="dyn-desc">Book your private Boracay Whale Shark tour right now.</p>
+  </div>
+
+  <!-- Step Progress Bar — data-nosnippet keeps Google from pulling this into
+       search result snippets instead of the actual meta description. -->
+  <div class="wizard-steps" data-nosnippet>
+    <button type="button" class="wizard-step-tab active" data-step-tab="1">
+      <span class="wizard-step-num">1</span>
+      <span data-en="Booking Details" data-ko="예약 정보" data-zh="预约信息" data-ja="予約情報">Booking Details</span>
+    </button>
+    <button type="button" class="wizard-step-tab" data-step-tab="2">
+      <span class="wizard-step-num">2</span>
+      <span data-en="Guest Info" data-ko="예약자 정보" data-zh="预约人信息" data-ja="お客様情報">Guest Info</span>
+    </button>
+    <button type="button" class="wizard-step-tab" data-step-tab="3">
+      <span class="wizard-step-num">3</span>
+      <span data-en="Review Booking" data-ko="예약 확인" data-zh="预约确认" data-ja="予約確認">Review Booking</span>
+    </button>
+    <button type="button" class="wizard-step-tab" data-step-tab="4">
+      <span class="wizard-step-num">4</span>
+      <span data-en="Payment" data-ko="결제" data-zh="支付" data-ja="お支払い">Payment</span>
+    </button>
+    <button type="button" class="wizard-step-tab" data-step-tab="5">
+      <span class="wizard-step-num">5</span>
+      <span data-en="Confirm" data-ko="확정" data-zh="确定" data-ja="確定">Confirm</span>
+    </button>
+  </div>
+
+  <div class="wizard-body">
+
+    <!-- Main step content -->
+    <div class="wizard-main">
+      <form id="reservation-form">
+
+        <!-- Tour Options Selection (Hidden as requested - pre-selected via URL) -->
+        <div class="form-group" style="display: none;">
+          <label>Select Tour Option *</label>
+          <div class="tour-options">
+            <label class="tour-option">
+              <input type="radio" name="tourType" value="F" checked required>
+              <div class="tour-card">
+                <h4>Fast Track</h4>
+                <span>3,600PHP<br><small>All-inclusive + Fast Track</small></span>
+              </div>
+            </label>
+            <label class="tour-option">
+              <input type="radio" name="tourType" value="VF" required>
+              <div class="tour-card">
+                <h4>VIPFast Track</h4>
+                <span>5,820PHP<br><small>Private vehicle + Photographer</small></span>
+              </div>
+            </label>
+            <label class="tour-option">
+              <input type="radio" name="tourType" value="R" required>
+              <div class="tour-card">
+                <h4>Regular Tour</h4>
+                <span>2,820PHP<br><small>Basics included</small></span>
+              </div>
+            </label>
+            <label class="tour-option">
+              <input type="radio" name="tourType" value="T" required>
+              <div class="tour-card">
+                <h4>Ticket Only</h4>
+                <span>1,920PHP<br><small>Purchase ticket only</small></span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Inclusions Info Panel -->
+          <div id="tour-inclusions" style="margin-top: 16px; padding: 16px; background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 12px; font-size: 0.9rem; line-height: 1.6; color: var(--color-fg); display: none;">
+            <!-- Content filled by JS -->
+          </div>
+        </div>
+
+        <!-- ===== STEP 1: BOOKING DETAILS ===== -->
+        <div class="wizard-panel active" data-step="1">
+          <h2 data-en="Booking Details" data-ko="예약 정보" data-zh="预约信息" data-ja="予約情報">Booking Details</h2>
+
+          <div class="form-group">
+            <label for="date" data-en="Desired Tour Date *" data-ko="투어 희망 날짜 *" data-zh="希望游览日期 *" data-ja="希望ツアー日 *">Desired Tour Date *</label>
+            <input type="date" id="date" name="date" class="input-luxury" required>
+          </div>
+
+          <div class="form-group">
+            <label for="pickupResort" data-en="Resort (optional)" data-ko="리조트 (선택사항)" data-zh="度假村（选填）" data-ja="リゾート（任意）">Resort (optional)</label>
+            <input type="text" id="pickupResort" name="pickupResort" class="input-luxury" placeholder="e.g. Shangri-La Boracay">
+          </div>
+
+          <div class="form-group">
+            <label for="people" data-en="Number of People *" data-ko="참여 인원 *" data-zh="参加人数 *" data-ja="参加人数 *">Number of People *</label>
+            <input type="number" id="people" name="people" class="input-luxury" min="1" max="20" value="2" required>
+          </div>
+
+          <div class="form-group">
+            <label for="nationality" data-en="Nationality *" data-ko="국적선택 *" data-zh="国籍选择 *" data-ja="国籍選択 *">Nationality *</label>
+            <select id="nationality" name="nationality" class="input-luxury" required>
+              <option value="" disabled selected data-en="Select nationality" data-ko="국적을 선택하세요" data-zh="请选择国籍" data-ja="国籍を選択してください">Select nationality</option>
+              <option value="PH" data-en="Philippine" data-ko="필리핀" data-zh="菲律宾" data-ja="フィリピン">Philippine</option>
+              <option value="FOREIGN" data-en="Foreigner" data-ko="외국인" data-zh="外国人" data-ja="外国人">Foreigner</option>
+            </select>
+          </div>
+
+          <div class="price-preview" id="price-preview" style="display:none;">
+            <span data-en="Price per Person" data-ko="1인 가격" data-zh="每人价格" data-ja="1名あたりの料金">Price per Person</span>
+            <strong id="pp-price">-</strong>
+            <span class="price-total" id="pp-total"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="pickup" data-en="Pick Up Location *" data-ko="픽업 장소 *" data-zh="接送地点 *" data-ja="ピックアップ場所 *">Pick Up Location *</label>
+            <select id="pickup" name="pickup" class="input-luxury" required>
+              <option value="Jollibee Main Road" selected data-en="Jollibee Main Road" data-ko="메인로드 졸리비" data-zh="乔利比大道" data-ja="ジョリビー・メインロード">Jollibee Main Road</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="meeting-time-group" style="display:none;">
+            <label for="meetingTime" data-en="Meeting Time *" data-ko="미팅 시간 *" data-zh="集合时间 *" data-ja="集合時間 *">Meeting Time *</label>
+
+            <div id="meeting-select-block">
+              <select id="meetingTime" name="meetingTime" class="input-luxury">
+                <option value="07:30" data-en="07:30 AM" data-ko="오전 07:30" data-zh="上午7:30" data-ja="午前7:30">07:30 AM</option>
+                <option value="09:00" data-en="09:00 AM" data-ko="오전 09:00" data-zh="上午9:00" data-ja="午前9:00">09:00 AM</option>
+              </select>
+            </div>
+
+            <p class="map-caption" id="meeting-fixed-note" style="display:none;" data-en="Meeting Time: 07:30 AM" data-ko="미팅 시간: 오전 07:30" data-zh="集合时间：上午7:30" data-ja="集合時間：午前7:30">Meeting Time: 07:30 AM</p>
+
+            <p class="map-caption" data-en="Meeting Point: Jollibee Main Road, Boracay" data-ko="미팅 장소: 메인로드 졸리비, 보라카이" data-zh="集合地点：长滩岛乔利比大道" data-ja="集合場所：ボラカイ ジョリビー・メインロード">Meeting Point: Jollibee Main Road, Boracay</p>
+            <a id="meeting-map-link" href="https://www.google.com/maps/search/?api=1&query=Jollibee+Boracay+Main+Road+Malay+Aklan+Philippines" target="_blank" rel="noopener" class="map-link-btn" data-en="Open in Google Maps" data-ko="구글맵에서 보기" data-zh="在谷歌地图中查看" data-ja="Googleマップで見る">Open in Google Maps</a>
+          </div>
+
+          <div class="form-group">
+            <label data-en="Route Map" data-ko="경로 지도" data-zh="路线地图" data-ja="ルートマップ">Route Map</label>
+            <div id="route-map"></div>
+            <p class="map-caption" data-en="Illustrative route only — actual pickup involves a boat transfer to Libertad, Antique." data-ko="실제 경로는 안티케주 리버타드까지 보트 이동을 포함합니다 (참고용 지도)." data-zh="仅为示意路线——实际接送需经安蒂克省利伯塔德的渡船前往。" data-ja="あくまで参考用のルート図です。実際の送迎はアンティーケ州リベルタッドまでの船移動を含みます。">Illustrative route only — actual pickup involves a boat transfer to Libertad, Antique.</p>
+          </div>
+
+          <div class="wizard-actions">
+            <button type="button" class="wizard-next" data-goto="2" data-en="Next: Guest Info" data-ko="다음: 예약자 정보" data-zh="下一步：预约人信息" data-ja="次へ：お客様情報">Next: Guest Info</button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 2: GUEST INFO ===== -->
+        <div class="wizard-panel" data-step="2">
+          <h2 data-en="Guest Info" data-ko="예약자 정보" data-zh="预约人信息" data-ja="お客様情報">Guest Info</h2>
+
+          <div class="form-group">
+            <label for="name" data-en="Name (English) *" data-ko="예약자 성함 (영문) *" data-zh="姓名（英文）*" data-ja="氏名（ローマ字）*">Name (English) *</label>
+            <input type="text" id="name" name="name" class="input-luxury" placeholder="HONG GILDONG" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email" data-en="Email *" data-ko="이메일 *" data-zh="邮箱 *" data-ja="メールアドレス *">Email *</label>
+            <input type="email" id="email" name="email" class="input-luxury" placeholder="Enter your email address" required>
+          </div>
+
+          <div class="form-group">
+            <label for="emergencyContact" data-en="Emergency Contact (optional)" data-ko="비상 연락처 (선택)" data-zh="紧急联系方式（选填）" data-ja="緊急連絡先（任意）">Emergency Contact (optional)</label>
+            <input type="tel" id="emergencyContact" name="emergencyContact" class="input-luxury" placeholder="+63 9XX XXX XXXX">
+          </div>
+
+          <div class="form-group">
+            <label for="referralCode" data-en="Referral Code (optional)" data-ko="레퍼럴 코드 (선택사항)" data-zh="推荐码（选填）" data-ja="紹介コード（任意）">Referral Code (optional)</label>
+            <input type="text" id="referralCode" name="referralCode" class="input-luxury" placeholder="" autocomplete="off">
+          </div>
+
+          <div class="wizard-actions">
+            <button type="button" class="wizard-back" data-goto="1" data-en="Back" data-ko="이전" data-zh="上一步" data-ja="戻る">Back</button>
+            <button type="button" class="wizard-next" data-goto="3" data-en="Next: Review Booking" data-ko="다음: 예약 확인" data-zh="下一步：预约确认" data-ja="次へ：予約確認">Next: Review Booking</button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 3: REVIEW BOOKING ===== -->
+        <div class="wizard-panel" data-step="3">
+          <h2 data-en="Review Booking" data-ko="예약 확인" data-zh="预约确认" data-ja="予約確認">Review Booking</h2>
+          <div class="review-list">
+            <div class="review-row"><span data-en="Package Type" data-ko="패키지 종류" data-zh="套餐类型" data-ja="パッケージ種類">Package Type</span><strong id="rv-package">-</strong></div>
+            <div class="review-row"><span data-en="Travel Date" data-ko="투어 날짜" data-zh="游览日期" data-ja="ツアー日">Travel Date</span><strong id="rv-date">-</strong></div>
+            <div class="review-row"><span data-en="Pick Up Location" data-ko="픽업 장소" data-zh="接送地点" data-ja="ピックアップ場所">Pick Up Location</span><strong id="rv-pickup">-</strong></div>
+            <div class="review-row"><span data-en="Resort" data-ko="리조트" data-zh="度假村" data-ja="リゾート">Resort</span><strong id="rv-resort">-</strong></div>
+            <div class="review-row" id="rv-meeting-row" style="display:none;"><span data-en="Meeting Time" data-ko="미팅 시간" data-zh="集合时间" data-ja="集合時間">Meeting Time</span><strong id="rv-meeting">-</strong></div>
+            <div class="review-row"><span data-en="Passengers" data-ko="인원" data-zh="人数" data-ja="人数">Passengers</span><strong id="rv-people">-</strong></div>
+            <div class="review-row"><span data-en="Nationality" data-ko="국적" data-zh="国籍" data-ja="国籍">Nationality</span><strong id="rv-nationality">-</strong></div>
+            <div class="review-row"><span data-en="Name" data-ko="예약자 성함" data-zh="姓名" data-ja="氏名">Name</span><strong id="rv-name">-</strong></div>
+            <div class="review-row"><span data-en="Email" data-ko="이메일" data-zh="邮箱" data-ja="メール">Email</span><strong id="rv-email">-</strong></div>
+            <div class="review-row"><span data-en="Emergency Contact" data-ko="비상 연락처" data-zh="紧急联系方式" data-ja="緊急連絡先">Emergency Contact</span><strong id="rv-emergency">-</strong></div>
+            <div class="review-row review-row--total"><span data-en="Total Price" data-ko="총 금액" data-zh="总金额" data-ja="合計金額">Total Price</span><strong id="rv-total">-</strong></div>
+          </div>
+
+          <div class="wizard-actions">
+            <button type="button" class="wizard-back" data-goto="2" data-en="Back" data-ko="이전" data-zh="上一步" data-ja="戻る">Back</button>
+            <button type="button" class="wizard-next" data-goto="4" data-en="Next: Payment" data-ko="다음: 결제" data-zh="下一步：支付" data-ja="次へ：お支払い">Next: Payment</button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 4: PAYMENT ===== -->
+        <div class="wizard-panel" data-step="4">
+          <h2 data-en="Payment" data-ko="결제" data-zh="支付" data-ja="お支払い">Payment</h2>
+
+          <div class="form-group" id="payment-choice-group">
+            <label data-en="How would you like to pay? *" data-ko="결제 방법을 선택해 주세요 *" data-zh="请选择支付方式 *" data-ja="お支払い方法をお選びください *">How would you like to pay? *</label>
+            <div class="payment-type-options">
+              <label class="payment-type-option">
+                <input type="radio" name="paymentChoice" value="qrph" checked>
+                <div class="payment-type-card">
+                  <span class="pt-title" data-en="Pay via QR" data-ko="QR 결제" data-zh="扫码支付" data-ja="QRコード決済">Pay via QR</span>
+                  <span class="pt-desc" data-en="GCash, Maya, or any bank app" data-ko="GCash, Maya, 은행 앱 모두 가능" data-zh="支持GCash、Maya及各类银行App" data-ja="GCash・Maya・銀行アプリでお支払い可能">GCash, Maya, or any bank app</span>
+                </div>
+              </label>
+              <label class="payment-type-option">
+                <input type="radio" name="paymentChoice" value="onsite">
+                <div class="payment-type-card">
+                  <span class="pt-title" data-en="Pay On-Site" data-ko="현장결제" data-zh="现场支付" data-ja="現地払い">Pay On-Site</span>
+                  <span class="pt-desc" data-en="Cash at the meeting point on tour day" data-ko="투어 당일 미팅 장소에서 현금 결제" data-zh="游览当天在集合地点现金支付" data-ja="ツアー当日、集合場所にて現金でお支払い">Cash at the meeting point on tour day</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <p class="payment-note" id="payment-note" data-en="Choose Pay via QR to pay online now, or pay in person on-site on tour day." data-ko="QR 결제로 지금 결제하시거나, 투어 당일 현장에서 결제하실 수 있습니다." data-zh="选择扫码支付即可立即在线完成付款，或选择在游览当天现场支付。" data-ja="QRコード決済を選ぶと今すぐオンラインでお支払いいただけます。ツアー当日に現地でお支払いいただくことも可能です。">Choose Pay via QR to pay online now, or pay in person on-site on tour day.</p>
+
+          <div class="review-row review-row--total" style="margin-bottom:20px;"><span data-en="Total" data-ko="총 금액" data-zh="总计" data-ja="合計">Total</span><strong id="pay-total">-</strong></div>
+
+          <div class="qrph-box" id="qrph-box" style="display:none;">
+            <img id="qrph-qr-img" alt="Scan to Pay" class="qrph-qr-img">
+            <p class="qrph-status" id="qrph-status" data-en="Waiting for payment..." data-ko="결제 대기 중..." data-zh="等待支付中..." data-ja="決済待機中...">Waiting for payment...</p>
+            <button type="button" class="qrph-cancel" id="qrph-cancel" data-en="Cancel" data-ko="취소" data-zh="取消" data-ja="キャンセル">Cancel</button>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submit-btn" data-en="Confirm Reservation" data-ko="예약 확정하기" data-zh="确认预约" data-ja="予約を確定する">Confirm Reservation</button>
+          <p id="form-status" class="form-status" role="status"></p>
+
+          <div class="wizard-actions">
+            <button type="button" class="wizard-back" data-goto="3" data-en="Back" data-ko="이전" data-zh="上一步" data-ja="戻る">Back</button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 5: CONFIRM ===== -->
+        <div class="wizard-panel" data-step="5">
+          <h2 data-en="✓ Booking Confirmed" data-ko="✓ 예약이 확정되었습니다" data-zh="✓ 预约已确认" data-ja="✓ 予約が確定しました">✓ Booking Confirmed</h2>
+          <p data-en="Redirecting to your confirmation page..." data-ko="확인 페이지로 이동합니다..." data-zh="正在跳转至确认页面..." data-ja="確認ページへ移動しています...">Redirecting to your confirmation page...</p>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Sidebar: Booking Summary -->
+    <aside class="wizard-sidebar">
+      <div class="summary-card">
+        <div class="summary-header">
+          <h3 data-en="Your Booking Summary" data-ko="예약 요약" data-zh="预约摘要" data-ja="ご予約内容">Your Booking Summary</h3>
+          <button type="button" class="summary-edit" data-goto="1" data-en="Edit Your Booking" data-ko="예약 수정" data-zh="修改预约" data-ja="予約を編集">Edit Your Booking</button>
+        </div>
+        <div class="summary-row"><span data-en="Package Type" data-ko="패키지 종류" data-zh="套餐类型" data-ja="パッケージ種類">Package Type</span><strong id="sum-package">-</strong></div>
+        <div class="summary-row"><span data-en="Travel Date" data-ko="투어 날짜" data-zh="游览日期" data-ja="ツアー日">Travel Date</span><strong id="sum-date">-</strong></div>
+        <div class="summary-row"><span data-en="Pick Up Location" data-ko="픽업 장소" data-zh="接送地点" data-ja="ピックアップ場所">Pick Up Location</span><strong id="sum-pickup">-</strong></div>
+        <div class="summary-row"><span data-en="Passengers" data-ko="인원" data-zh="人数" data-ja="人数">Passengers</span><strong id="sum-people">-</strong></div>
+        <div class="summary-row summary-row--total"><span data-en="Total Price" data-ko="총 금액" data-zh="总金额" data-ja="合計金額">Total Price</span><strong id="sum-total">-</strong></div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- Dynamic Text and Reservation Script -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedTour = urlParams.get('tour');
+    const tourParam = urlParams.get('tour'); // for routing logic
+
+    // Inclusions data
+    const inclusionsData = {
+      en: {
+        'F': '<b>[Fast Track Inclusions]</b><br>Admission, viewing, environmental fee, round-trip vehicle all included<br>Free rental of life jacket, luggage storage, fins, and bottled water provided<br>Fast Track (minimal wait for Whale Shark)<br>Drop-off service after Whale Shark tour<br>Whale Shark underwater photography included',
+        'VF': '<b>[VIP Fast Track Inclusions]</b><br>Admission, viewing, environmental fee, <b>Exclusive private vehicle</b> all included<br>Free rental of life jacket, luggage storage, fins, snorkel mask, and bottled water<br>Fast Track (minimal wait for Whale Shark)<br>Drop-off service after Whale Shark tour<br><b>Libertad Professional Underwater Photographer Service</b>',
+        'R': '<b>[Regular Tour Inclusions]</b><br>Guide and fins included<br>※ General admission tickets are used',
+        'T': '<b>[Ticket Only Info]</b><br>Exclusive sale of admission tickets only (1,920PHP)<br>Ticket pickup: Official Boracay Whale Shark Office<br>Available time: 8:00 AM ~ 6:00 PM'
+      },
+      ko: {
+        'F': '<b>[Fast Track 포함사항]</b><br>입장료, 관람료, 환경보호세, 왕복 차량 모두 포함<br>구명조끼, 짐 보관, 오리발, 생수 무료 제공<br>Fast Track (고래상어 대기 최소화)<br>투어 종료 후 드랍서비스<br>고래상어 수중 촬영 포함',
+        'VF': '<b>[VIP Fast Track 포함사항]</b><br>입장료, 관람료, 환경보호세, <b>전용 프라이빗 차량</b> 모두 포함<br>구명조끼, 짐 보관, 오리발, 스노클마스크, 생수 무료 제공<br>Fast Track (고래상어 대기 최소화)<br>투어 종료 후 드랍서비스<br><b>리버타드 전문 수중 사진작가 서비스</b>',
+        'R': '<b>[Regular 투어 포함사항]</b><br>가이드 및 오리발 포함<br>※ 일반 입장권 사용',
+        'T': '<b>[티켓 단독 안내]</b><br>입장권만 단독 판매 (1,920PHP)<br>티켓 수령: 보라카이 고래상어 공식 사무소<br>운영 시간: 오전 8:00 ~ 오후 6:00'
+      },
+      zh: {
+        'F': '<b>[Fast Track 包含项目]</b><br>门票、参观费、环境保护费、往返车辆费用全部包含<br>免费提供救生衣、行李寄存、脚蹼、瓶装水<br>Fast Track（最大程度缩短鲸鲨等待时间）<br>行程结束后提供送返服务<br>包含鲸鲨水下摄影',
+        'VF': '<b>[VIP Fast Track 包含项目]</b><br>门票、参观费、环境保护费、<b>专属私人车辆</b>全部包含<br>免费提供救生衣、行李寄存、脚蹼、浮潜面罩、瓶装水<br>Fast Track（最大程度缩短鲸鲨等待时间）<br>行程结束后提供送返服务<br><b>利伯塔德专业水下摄影师服务</b>',
+        'R': '<b>[Regular 行程包含项目]</b><br>包含向导及脚蹼<br>※ 使用普通门票',
+        'T': '<b>[仅门票信息]</b><br>仅单独出售门票（1,920PHP）<br>取票地点：Boracay Whale Shark 官方办公室<br>营业时间：上午8:00 ~ 下午6:00'
+      },
+      ja: {
+        'F': '<b>【Fast Track 含まれるもの】</b><br>入場料・観覧料・環境保護税・往復車両費すべて込み<br>ライフジャケット・荷物預かり・フィン・ミネラルウォーター無料提供<br>Fast Track（ジンベエザメの待ち時間を最小化）<br>ツアー終了後のドロップオフサービス<br>ジンベエザメの水中撮影込み',
+        'VF': '<b>【VIP Fast Track 含まれるもの】</b><br>入場料・観覧料・環境保護税・<b>専用プライベート車両</b>すべて込み<br>ライフジャケット・荷物預かり・フィン・スノーケルマスク・ミネラルウォーター無料提供<br>Fast Track（ジンベエザメの待ち時間を最小化）<br>ツアー終了後のドロップオフサービス<br><b>リベルタッド専属水中カメラマンサービス</b>',
+        'R': '<b>【Regular ツアー含まれるもの】</b><br>ガイド・フィン込み<br>※ 一般入場チケットを使用します',
+        'T': '<b>【チケットのみのご案内】</b><br>入場チケットのみの単独販売（1,920PHP）<br>チケット受け取り：Boracay Whale Shark 公式オフィス<br>営業時間：午前8:00～午後6:00'
+      }
+    };
+
+    const radios = document.querySelectorAll('input[name="tourType"]');
+    const inclusionsPanel = document.getElementById('tour-inclusions');
+    const meetingTimeGroup = document.getElementById('meeting-time-group');
+    const meetingSelectBlock = document.getElementById('meeting-select-block');
+    const meetingFixedNote = document.getElementById('meeting-fixed-note');
+    const meetingSelect = document.getElementById('meetingTime');
+
+    // Regular tour: shared meeting point, customer picks one of two times.
+    // Fast Track / VIP Fast Track: also meet at a fixed 07:30 AM, but there's
+    // no choice, so it's shown as plain text and the value is set programmatically.
+    // Ticket Only: no scheduled meeting at all. The meeting-point caption/map
+    // link (Jollibee Main Road) is static markup shared by both branches.
+    function updateMeetingTime() {
+      const selectedValue = document.querySelector('input[name="tourType"]:checked').value;
+
+      if (selectedValue === 'R') {
+        meetingTimeGroup.style.display = 'block';
+        meetingSelectBlock.style.display = 'block';
+        meetingFixedNote.style.display = 'none';
+      } else if (selectedValue === 'F' || selectedValue === 'VF') {
+        meetingTimeGroup.style.display = 'block';
+        meetingSelectBlock.style.display = 'none';
+        meetingFixedNote.style.display = 'block';
+        meetingSelect.value = '07:30';
+      } else {
+        meetingTimeGroup.style.display = 'none';
+      }
+    }
+
+    function updateInclusions() {
+      const selectedValue = document.querySelector('input[name="tourType"]:checked').value;
+      const lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+      const data = inclusionsData[lang];
+      if (data[selectedValue]) {
+        inclusionsPanel.innerHTML = data[selectedValue];
+        inclusionsPanel.style.display = 'block';
+      } else {
+        inclusionsPanel.style.display = 'none';
+      }
+    }
+
+    if (requestedTour) {
+      const radio = document.querySelector(`input[name="tourType"][value="${requestedTour}"]`);
+      if (radio) radio.checked = true;
+    }
+
+    // Pre-fill from the main page's quick booking search widget
+    const requestedDate = urlParams.get('date');
+    if (requestedDate) document.getElementById('date').value = requestedDate;
+    const requestedPeople = urlParams.get('people');
+    if (requestedPeople) document.getElementById('people').value = requestedPeople;
+    const requestedNationality = urlParams.get('nationality');
+    if (requestedNationality) document.getElementById('nationality').value = requestedNationality;
+    const requestedRef = urlParams.get('ref');
+    if (requestedRef) document.getElementById('referralCode').value = requestedRef;
+
+    // Update inclusions on initial load
+    updateInclusions();
+    updateMeetingTime();
+
+    // Update inclusions on radio button change
+    radios.forEach(r => r.addEventListener('change', updateInclusions));
+
+    const badge = document.getElementById('dyn-badge');
+    const title = document.getElementById('dyn-title');
+    const desc = document.getElementById('dyn-desc');
+    const btn = document.getElementById('submit-btn');
+
+    // Dynamically update left panel
+    const leftPanelTitle = {
+      en: { VF: 'VIP FAST TRACK', F: 'FAST TRACK', R: 'REGULAR TOUR', T: 'TICKET ONLY' },
+      ko: { VF: 'VIP 패스트트랙', F: '패스트트랙', R: '레귤러 투어', T: '티켓 단독' },
+      zh: { VF: 'VIP 快速通道', F: '快速通道', R: '常规团', T: '仅门票' },
+      ja: { VF: 'VIPファストトラック', F: 'ファストトラック', R: 'レギュラーツアー', T: 'チケットのみ' }
+    };
+    const leftPanelDesc = {
+      en: {
+        VF: 'A perfect premium tour with an exclusive private vehicle and underwater photographer.',
+        F: 'The most popular All-inclusive package. Enjoy comfortably with minimal wait time.',
+        R: 'A whale shark tour that stays true to the basics.',
+        T: 'Simply pick up your admission ticket at the official Boracay Whale Shark office.'
+      },
+      ko: {
+        VF: '전용 차량과 수중 사진작가가 포함된 완벽한 프리미엄 투어입니다.',
+        F: '가장 인기 있는 올인클루시브 패키지. 최소 대기시간으로 편안하게 즐기세요.',
+        R: '고래상어 투어의 기본에 충실한 상품입니다.',
+        T: '보라카이 고래상어 공식 사무소에서 입장권만 간편하게 수령하세요.'
+      },
+      zh: {
+        VF: '专属私人车辆加水下摄影师，完美的高端行程体验。',
+        F: '最受欢迎的全包套餐，最大程度缩短等待时间，轻松享受。',
+        R: '忠于基本配置的鲸鲨行程。',
+        T: '只需在 Boracay Whale Shark 官方办公室领取门票即可。'
+      },
+      ja: {
+        VF: '専用車両と水中カメラマンが付いた、完璧なプレミアムツアーです。',
+        F: '最も人気のオールインクルーシブパッケージ。待ち時間を最小限に、快適にお楽しみいただけます。',
+        R: '基本に忠実なジンベエザメツアーです。',
+        T: 'Boracay Whale Shark 公式オフィスで入場チケットを受け取るだけです。'
+      }
+    };
+
+    function selectedPackageName() {
+      const val = document.querySelector('input[name="tourType"]:checked').value;
+      const lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+      return leftPanelTitle[lang][val] || '-';
+    }
+
+    function updateLeftPanel() {
+      const val = document.querySelector('input[name="tourType"]:checked').value;
+      const lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+      const d = leftPanelDesc[lang];
+      title.textContent = selectedPackageName();
+      desc.textContent = d[val];
+      btn.style.border = 'none';
+      btn.style.color = '#fff';
+      if (val === 'VF') { btn.style.background = 'var(--color-primary)'; }
+      else if (val === 'F') { btn.style.background = 'var(--color-accent)'; }
+      else if (val === 'R') { btn.style.background = 'var(--color-fg)'; }
+      else if (val === 'T') { btn.style.background = '#10b981'; }
+    }
+
+    updateLeftPanel();
+    radios.forEach(r => r.addEventListener('change', updateLeftPanel));
+
+    // ── Booking summary sidebar + review step ──
+    function fmtDate(val) {
+      if (!val) return '-';
+      const lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+      const d = new Date(val + 'T00:00:00');
+      if (isNaN(d)) return val;
+      const locale = { ko: 'ko-KR', zh: 'zh-CN', ja: 'ja-JP' }[lang] || 'en-US';
+      return d.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    // ── Pricing (per person, PHP) — differs by nationality ──
+    const PRICES = {
+      PH:      { VF: 5820, F: 3300, R: 2520, T: 1620 },
+      FOREIGN: { VF: 5820, F: 3600, R: 2820, T: 1920 }
+    };
+    window.PRICES = PRICES;
+    const nationalityNames = {
+      en: { PH: 'Philippine', FOREIGN: 'Foreigner' },
+      ko: { PH: '필리핀', FOREIGN: '외국인' },
+      zh: { PH: '菲律宾', FOREIGN: '外国人' },
+      ja: { PH: 'フィリピン', FOREIGN: '外国人' }
+    };
+
+    function currentPricePerPerson() {
+      const tour = document.querySelector('input[name="tourType"]:checked').value;
+      const nationality = document.getElementById('nationality').value;
+      if (!nationality || !PRICES[nationality]) return null;
+      return PRICES[nationality][tour] || null;
+    }
+
+    function fmtPHP(n) {
+      return n.toLocaleString('en-US') + ' PHP';
+    }
+
+    function updateSummary() {
+      updateMeetingTime();
+      const pkg = selectedPackageName();
+      const dateVal = fmtDate(document.getElementById('date').value);
+      const pickupSelect = document.getElementById('pickup');
+      const pickupVal = pickupSelect.selectedOptions[0] ? pickupSelect.selectedOptions[0].textContent : '-';
+      const resortVal = document.getElementById('pickupResort').value.trim() || '-';
+      const peopleVal = document.getElementById('people').value || '-';
+      const people = Number(document.getElementById('people').value) || 0;
+      const nameVal = document.getElementById('name').value || '-';
+      const emailVal = document.getElementById('email').value || '-';
+      const emergencyVal = document.getElementById('emergencyContact').value || '-';
+      const lang = (typeof currentLang !== 'undefined') ? currentLang : 'en';
+      const nationalityCode = document.getElementById('nationality').value;
+      const nationalityVal = nationalityCode ? nationalityNames[lang][nationalityCode] : '-';
+      const tourVal = document.querySelector('input[name="tourType"]:checked').value;
+
+      ['sum-package', 'rv-package'].forEach(id => document.getElementById(id).textContent = pkg);
+      ['sum-date', 'rv-date'].forEach(id => document.getElementById(id).textContent = dateVal);
+      ['sum-pickup', 'rv-pickup'].forEach(id => document.getElementById(id).textContent = pickupVal);
+      ['sum-people', 'rv-people'].forEach(id => document.getElementById(id).textContent = peopleVal);
+      document.getElementById('rv-resort').textContent = resortVal;
+      document.getElementById('rv-name').textContent = nameVal;
+      document.getElementById('rv-email').textContent = emailVal;
+      document.getElementById('rv-emergency').textContent = emergencyVal;
+      document.getElementById('rv-nationality').textContent = nationalityVal;
+
+      // Regular / Fast Track / VIP Fast Track: show the meeting time in the review step
+      const meetingRow = document.getElementById('rv-meeting-row');
+      if (tourVal === 'R' || tourVal === 'F' || tourVal === 'VF') {
+        const meetingSelect = document.getElementById('meetingTime');
+        const meetingVal = meetingSelect.selectedOptions[0] ? meetingSelect.selectedOptions[0].textContent : '-';
+        document.getElementById('rv-meeting').textContent = meetingVal;
+        meetingRow.style.display = 'flex';
+      } else {
+        meetingRow.style.display = 'none';
+      }
+
+      // Price preview (Step 1)
+      const pricePreview = document.getElementById('price-preview');
+      const perPerson = currentPricePerPerson();
+      if (perPerson) {
+        pricePreview.style.display = 'flex';
+        document.getElementById('pp-price').textContent = fmtPHP(perPerson);
+        const totalLabel = lang === 'ko' ? `(총 ${people}명: ${fmtPHP(perPerson * people)})` : `(Total for ${people}: ${fmtPHP(perPerson * people)})`;
+        document.getElementById('pp-total').textContent = people > 0 ? totalLabel : '';
+      } else {
+        pricePreview.style.display = 'none';
+      }
+
+      // Total price
+      const total = perPerson && people > 0 ? perPerson * people : 0;
+      const totalText = total ? fmtPHP(total) : '-';
+      ['sum-total', 'rv-total', 'pay-total'].forEach(id => document.getElementById(id).textContent = totalText);
+
+      if (window.updateRouteMap) window.updateRouteMap(pickupVal);
+    }
+
+    ['date', 'people', 'pickup', 'name', 'email', 'nationality'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updateSummary);
+      document.getElementById(id).addEventListener('change', updateSummary);
+    });
+    radios.forEach(r => r.addEventListener('change', updateSummary));
+    updateSummary();
+
+    // ── Step wizard navigation ──
+    function goToStep(n) {
+      document.querySelectorAll('.wizard-panel').forEach(p => p.classList.toggle('active', p.dataset.step === String(n)));
+      document.querySelectorAll('.wizard-step-tab').forEach(t => t.classList.toggle('active', t.dataset.stepTab === String(n)));
+      window.scrollTo({ top: document.querySelector('.wizard-steps').offsetTop - 90, behavior: 'smooth' });
+    }
+    window.goToStep = goToStep;
+
+    function panelIsValid(step) {
+      const panel = document.querySelector(`.wizard-panel[data-step="${step}"]`);
+      const inputs = panel.querySelectorAll('input[required], select[required]');
+      for (const inp of inputs) {
+        if (!inp.checkValidity()) { inp.reportValidity(); return false; }
+      }
+      return true;
+    }
+
+    document.querySelectorAll('.wizard-next').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const current = btn.closest('.wizard-panel').dataset.step;
+        if (!panelIsValid(current)) return;
+        if (current === '2') updateSummary();
+        goToStep(btn.dataset.goto);
+      });
+    });
+    document.querySelectorAll('.wizard-back, .summary-edit').forEach(btn => {
+      btn.addEventListener('click', () => goToStep(btn.dataset.goto));
+    });
+    document.querySelectorAll('.wizard-step-tab').forEach(tab => {
+      tab.addEventListener('click', () => goToStep(tab.dataset.stepTab));
+    });
+
+    window.showConfirmStep = () => goToStep(5);
+
+    // Expose so the language toggle (defined in a later, separate script) can re-render on switch
+    window.updateInclusions = updateInclusions;
+    window.updateLeftPanel = updateLeftPanel;
+    window.updateSummary = updateSummary;
+  });
+</script>
+
+<!-- Route Map (Leaflet) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const pickupCoords = { lat: 11.9674, lng: 121.9248 }; // Boracay Island
+    const destCoords = { lat: 11.7667, lng: 122.0000 };   // Libertad, Antique (approx.)
+
+    const map = L.map('route-map', { scrollWheelZoom: false }).setView([11.87, 121.96], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const pickupMarker = L.marker([pickupCoords.lat, pickupCoords.lng]).addTo(map).bindPopup('Boracay');
+    const destMarker = L.marker([destCoords.lat, destCoords.lng]).addTo(map).bindPopup('Libertad Whale Shark Center');
+    const routeLine = L.polyline([[pickupCoords.lat, pickupCoords.lng], [destCoords.lat, destCoords.lng]], {
+      color: '#0078ff', weight: 3, dashArray: '6 8'
+    }).addTo(map);
+    map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });
+
+    window.updateRouteMap = (pickupLabel) => {
+      if (!pickupLabel || pickupLabel === '-') return;
+      pickupMarker.bindPopup(pickupLabel + ' Boracay');
+    };
+  });
+</script>
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    flatpickr("#date", {
+      minDate: "today",
+      disableMobile: "true",
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "F j, Y",
+      placeholder: "Please select a date"
+    });
+  });
+</script>
+<script>
+  // ── Language Toggle ──
+  const TEXTS = {
+    en: {
+      labelDate: 'Desired Tour Date *',
+      labelPeople: 'Number of People *',
+      labelName: 'Name (English) *',
+      labelEmail: 'Email *',
+      placeholderName: 'HONG GILDONG',
+      placeholderEmail: 'Enter your email address',
+      placeholderPickupResort: 'e.g. Shangri-La Boracay',
+      btnSubmit: 'Confirm Reservation',
+    },
+    ko: {
+      labelDate: '투어 희망 날짜 *',
+      labelPeople: '참여 인원 *',
+      labelName: '예약자 성함 (영문) *',
+      labelEmail: '이메일 *',
+      placeholderName: '홍길동',
+      placeholderEmail: '이메일 주소를 입력해주세요',
+      placeholderPickupResort: '예: 샹그릴라 보라카이',
+      btnSubmit: '예약 확정하기',
+    },
+    zh: {
+      labelDate: '希望游览日期 *',
+      labelPeople: '参加人数 *',
+      labelName: '姓名（英文）*',
+      labelEmail: '邮箱 *',
+      placeholderName: 'HONG GILDONG',
+      placeholderEmail: '请输入邮箱地址',
+      placeholderPickupResort: '例：Shangri-La Boracay',
+      btnSubmit: '确认预约',
+    },
+    ja: {
+      labelDate: '希望ツアー日 *',
+      labelPeople: '参加人数 *',
+      labelName: '氏名（ローマ字）*',
+      labelEmail: 'メールアドレス *',
+      placeholderName: 'HONG GILDONG',
+      placeholderEmail: 'メールアドレスを入力してください',
+      placeholderPickupResort: '例：Shangri-La Boracay',
+      btnSubmit: '予約を確定する',
+    }
+  };
+  const LANG_NAMES = { ko: '한국어', en: 'English', zh: '中文', ja: '日本語' };
+  const LANG_STORAGE_KEY = 'ws_lang';
+  // Same detection as the main site (js/i18n.js): respect a saved choice,
+  // otherwise follow the visitor's browser language. Keeps the reservation
+  // page in whatever language the visitor already landed in on the main page.
+  const savedLang = localStorage.getItem(LANG_STORAGE_KEY);
+  let currentLang = (savedLang && LANG_NAMES[savedLang])
+    ? savedLang
+    : (() => {
+        const nav = (navigator.language || '').toLowerCase();
+        if (nav.startsWith('ko')) return 'ko';
+        if (nav.startsWith('zh')) return 'zh';
+        if (nav.startsWith('ja')) return 'ja';
+        return 'en';
+      })();
+  localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+
+  // Language dropdown (mirrors the main site's #lang-select in js/i18n.js,
+  // but swaps text in place instead of navigating to /en, /zh, /ja pages —
+  // reservation.html is a single shared file for all four languages).
+  const langSelect = document.getElementById('lang-select');
+  if (langSelect) {
+    const trigger = langSelect.querySelector('.lang-select-trigger');
+    const menu = langSelect.querySelector('.lang-select-menu');
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('open');
+    });
+    document.addEventListener('click', () => menu.classList.remove('open'));
+    menu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        menu.classList.remove('open');
+        const lang = a.getAttribute('data-lang');
+        if (lang === currentLang) return;
+        currentLang = lang;
+        localStorage.setItem(LANG_STORAGE_KEY, currentLang);
+        applyLang(currentLang);
+      });
+    });
+  }
+
+  // QR 결제 박스는 실제로 PayMongo 결제 요청이 생성된 뒤에만 보여줍니다
+  // (js/reservation.js의 runQrphFlow가 직접 show/hide 제어) — 결제수단을
+  // 바꾸면 혹시 열려있던 QR 박스는 닫아줍니다.
+  document.querySelectorAll('input[name="paymentChoice"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const qrphBox = document.getElementById('qrph-box');
+      if (qrphBox) qrphBox.style.display = 'none';
+    });
+  });
+
+  function applyLang(lang) {
+    const t = TEXTS[lang];
+
+    // Generic data-en/data-ko elements (step tabs, summary, review, buttons, etc.)
+    document.querySelectorAll('[data-en][data-ko]').forEach(el => {
+      el.textContent = el.getAttribute(`data-${lang}`);
+    });
+
+    // Labels
+    document.querySelector('label[for="date"]') && (document.querySelector('label[for="date"]').textContent = t.labelDate);
+    document.querySelector('label[for="people"]') && (document.querySelector('label[for="people"]').textContent = t.labelPeople);
+    document.querySelector('label[for="name"]') && (document.querySelector('label[for="name"]').textContent = t.labelName);
+    document.querySelector('label[for="email"]') && (document.querySelector('label[for="email"]').textContent = t.labelEmail);
+    // Placeholders
+    document.getElementById('name') && (document.getElementById('name').placeholder = t.placeholderName);
+    document.getElementById('email') && (document.getElementById('email').placeholder = t.placeholderEmail);
+    document.getElementById('pickupResort') && (document.getElementById('pickupResort').placeholder = t.placeholderPickupResort);
+    // Submit button
+    document.getElementById('submit-btn') && (document.getElementById('submit-btn').textContent = t.btnSubmit);
+    // Lang dropdown current label + active state
+    if (langSelect) {
+      const current = langSelect.querySelector('.lang-select-current');
+      current && (current.textContent = LANG_NAMES[lang]);
+      langSelect.querySelectorAll('.lang-select-menu a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('data-lang') === lang);
+      });
+    }
+    // html lang
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+    // Re-render tour-dependent dynamic content in the new language
+    window.updateInclusions && window.updateInclusions();
+    window.updateLeftPanel && window.updateLeftPanel();
+    window.updateSummary && window.updateSummary();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    applyLang(currentLang);
+  });
+</script>
+<script type="module" src="js/reservation.js?v=1788925200"></script>
+</body>
+</html>

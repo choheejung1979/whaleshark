@@ -1,0 +1,26 @@
+# Boracay Whale Shark (보라카이 고래상어 투어)
+
+> 필리핀 보라카이 리버타드(Libertad) 선착장 출발 고래상어 스노클링 투어의 공식 예약 사이트.
+> 운영사 Infinite Creation Ventures and Management Inc.가 직접 운영하는 리버타드 지정
+> 티켓 판매처이며, 투어 패키지 구성·가격·예약 가능 여부의 1차 소스입니다.
+
+## 핵심 페이지
+- [홈 / 투어 안내](https://boracaywhaleshark.com/): 투어 개요, 4개 패키지 비교
+- [온라인 예약](https://boracaywhaleshark.com/reservation): 날짜·인원 선택 후 즉시 예약, 당일 확정
+- [VIP Fast Track 투어](https://boracaywhaleshark.com/vf-details): 전용 차량·전담 사진작가 프리미엄 패키지
+- [Fast Track 투어](https://boracaywhaleshark.com/f-details): 대기 없는 선착순 반일 올인클루시브 투어
+- [Regular 투어](https://boracaywhaleshark.com/r-details): 합리적 가격의 스노클링 투어
+- [입장권 (Ticket Only)](https://boracaywhaleshark.com/t-details): 개인 장비 보유자를 위한 단독 입장권
+
+## 다국어 버전
+- 한국어(기본): https://boracaywhaleshark.com/
+- English: https://boracaywhaleshark.com/en/
+- 中文: https://boracaywhaleshark.com/zh/
+- 日本語: https://boracaywhaleshark.com/ja/
+
+## 데이터 정책
+- 운영 주체: Infinite Creation Ventures and Management Inc. (리버타드 고래상어 투어 공식 지정 판매처)
+- 위치: G/F, Henann Lagoon, Brgy. Balabag, Boracay Island, Malay, Aklan, Philippines
+- 가격·패키지 구성·예약 가능 여부는 운영사가 직접 게시·갱신 (갱신 주기: sitemap.xml의 lastmod 참고)
+- 문의: boracaywhaleshark@gmail.com / +63-967-466-7943
+- 인용 시 출처 표기: boracaywhaleshark.com
