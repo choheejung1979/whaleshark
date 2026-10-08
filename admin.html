@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | BORACAY WHALE SHARK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css?v=1791260000">
+</head>
+<body>
+
+<!-- ═══ Login Overlay ═══ -->
+<div id="login-overlay">
+  <div class="login-box">
+    <h2>🐋 ADMIN</h2>
+    <p>관리자 계정으로 로그인하세요.</p>
+    <input type="email" id="email-input" class="login-input login-input--text" placeholder="이메일" autocomplete="username">
+    <input type="password" id="password-input" class="login-input login-input--text" placeholder="비밀번호" autocomplete="current-password">
+    <button id="login-btn" class="login-btn">로그인</button>
+    <div id="login-error">이메일 또는 비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+
+<!-- ═══ Dashboard ═══ -->
+<div id="dashboard">
+  <div class="layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">🐋</div>
+        <div class="sidebar-brand">BORACAY WS<small>Admin Panel</small></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="dashboard"><span class="ni">📊</span>Dashboard</a>
+        <a href="#" class="nav-item" data-view="reservations"><span class="ni">📋</span>예약 목록</a>
+        <a href="#" class="nav-item" data-view="agencies"><span class="ni">🤝</span>B2B 파트너</a>
+        <a href="#" class="nav-item" data-view="depositcash"><span class="ni">💳</span>예치금</a>
+        <a href="#" class="nav-item" data-view="settlement"><span class="ni">📑</span>정산</a>
+        <a href="#" class="nav-item" data-view="referral"><span class="ni">🔗</span>레퍼럴</a>
+        <a href="#" class="nav-item" data-view="yebo"><span class="ni">⭐</span>YEBO</a>
+        <a href="#" class="nav-item" data-view="accounts"><span class="ni">👤</span>계정 관리</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="./" class="nav-item"><span class="ni">🏠</span>메인 사이트</a>
+      </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main-content">
+
+      <!-- Topbar -->
+      <header class="topbar">
+        <div class="topbar-greeting">
+          <div class="gm" id="topbar-greeting-main">안녕하세요 👋</div>
+          <div class="gs" id="topbar-greeting-sub">오늘도 좋은 하루 되세요.</div>
+        </div>
+        <div class="topbar-search">
+          <span class="si">🔍</span>
+          <input type="text" placeholder="예약 검색..." id="topbar-search-input">
+        </div>
+        <div class="topbar-actions">
+          <button class="topbar-icon-btn" id="refresh-btn" title="새로고침">↻</button>
+          <button class="topbar-account-btn" id="logout-btn">
+            <div class="av" id="topbar-avatar">A</div>
+            <span id="topbar-email-short">Admin</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="content-body">
+
+        <!-- ══════════ VIEW: Dashboard ══════════ -->
+        <div id="view-dashboard" class="admin-view">
+          <div class="dash-grid">
+
+            <!-- Left column -->
+            <div class="dash-left">
+
+              <!-- Top 4 cards -->
+              <div class="today-stats-grid">
+                <a href="#" class="today-stat-card today-stat-card--accent" data-view="reservations">
+                  <div class="today-stat-top">
+                    <span class="today-stat-label">오늘 일정</span>
+                    <span class="today-stat-icon">📅</span>
+                  </div>
+                  <div class="today-stat-value" id="dash-today-date">-</div>
+                  <div class="today-stat-sub" id="dash-today-count">예약 0건</div>
+                </a>
+                <a href="#" class="today-stat-card" data-view="reservations">
+                  <div class="today-stat-top">
+                    <span class="today-stat-label">내일 일정</span>
+                    <span class="today-stat-icon">📅</span>
+                  </div>
+                  <div class="today-stat-value" id="dash-tomorrow-date">-</div>
+                  <div class="today-stat-sub" id="dash-tomorrow-count">예약 0건</div>
+                </a>
+                <a href="#" class="today-stat-card" data-view="reservations">
+                  <div class="today-stat-top">
+                    <span class="today-stat-label">신규 예약</span>
+                    <span class="today-stat-icon">📥</span>
+                  </div>
+                  <div class="today-stat-value" id="dash-stat-new">0</div>
+                  <div class="today-stat-sub">대기중</div>
+                </a>
+                <a href="#" class="today-stat-card" data-view="reservations">
+                  <div class="today-stat-top">
+                    <span class="today-stat-label">예약 확정</span>
+                    <span class="today-stat-icon">✅</span>
+                  </div>
+                  <div class="today-stat-value" id="dash-stat-confirmed">0</div>
+                  <div class="today-stat-sub">진행중</div>
+                </a>
+              </div>
+
+
+              <!-- Pending quick-action table -->
+              <div class="table-container">
+                <div class="table-header">
+                  <h2>⏳ 대기중 예약 — 빠른 처리</h2>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table>
+                    <thead>
+                      <tr><th>투어일</th><th>예약자</th><th>투어</th><th>인원</th><th>금액</th><th>결제</th><th>레퍼럴</th><th>액션</th></tr>
+                    </thead>
+                    <tbody id="dash-pending-tbody">
+                      <tr><td colspan="7" style="text-align:center;color:var(--admin-text-muted);">로딩 중...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+
+            </div><!-- /.dash-left -->
+
+            <!-- Right panel -->
+            <aside class="dash-right">
+
+              <!-- Donut chart -->
+              <div class="stats-panel">
+                <div class="panel-title">이번달 현황 <span id="panel-month-label">-</span></div>
+                <div class="donut-wrap">
+                  <svg class="donut-svg" viewBox="0 0 120 120">
+                    <circle class="donut-track" cx="60" cy="60" r="46"/>
+                    <circle class="donut-seg" id="donut-seg-confirmed" cx="60" cy="60" r="46"
+                      stroke="#10b981" stroke-dasharray="0 289" stroke-dashoffset="0"/>
+                    <circle class="donut-seg" id="donut-seg-pending" cx="60" cy="60" r="46"
+                      stroke="#f59e0b" stroke-dasharray="0 289" stroke-dashoffset="0"/>
+                  </svg>
+                  <div class="donut-center">
+                    <div class="donut-val" id="donut-revenue">₱0</div>
+                    <div class="donut-lbl">확정 매출</div>
+                  </div>
+                </div>
+                <div class="donut-legend">
+                  <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div>확정</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div>대기</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div>취소</div>
+                </div>
+              </div>
+
+              <!-- Recent activity -->
+              <div class="stats-panel">
+                <div class="panel-title">최근 예약</div>
+                <div class="activity-list" id="dash-activity-list">
+                  <div style="text-align:center;color:var(--admin-text-muted);font-size:.8rem;padding:12px 0;">로딩 중...</div>
+                </div>
+              </div>
+
+            </aside><!-- /.dash-right -->
+
+          </div><!-- /.dash-grid -->
+        </div><!-- /#view-dashboard -->
+
+        <!-- ══════════ VIEW: Reservations ══════════ -->
+        <div id="view-reservations" class="admin-view" style="display:none;">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <h3>전체 예약건수</h3>
+              <div class="value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>대기중 (Pending)</h3>
+              <div class="value" id="stat-pending" style="color:var(--admin-warning);">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>예약확정 (Confirmed)</h3>
+              <div class="value" id="stat-confirmed" style="color:var(--admin-success);">0</div>
+            </div>
+          </div>
+          <div class="table-container">
+            <div class="table-header"><h2>최신 예약 목록</h2></div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>날짜</th><th>예약자</th><th>투어</th><th>결제</th>
+                    <th>인원</th><th>국적</th><th>이메일</th><th>비상연락</th>
+                    <th>레퍼럴</th><th>미팅시간</th><th>상태</th><th>관리</th>
+                  </tr>
+                </thead>
+                <tbody id="reservation-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════ VIEW: B2B Partners ══════════ -->
+        <div id="view-agencies" class="admin-view" style="display:none;">
+          <div class="stats-grid">
+            <div class="stat-card"><h3>에이전시 수</h3><div class="value" id="agency-stat-count">0</div></div>
+            <div class="stat-card"><h3>예치금 합계</h3><div class="value" id="agency-stat-balance" style="color:var(--admin-success);">₱0</div></div>
+            <div class="stat-card"><h3>정산 필요</h3><div class="value" id="agency-stat-pending" style="color:var(--admin-danger);">0</div></div>
+          </div>
+          <div class="table-container" style="margin-bottom:16px;">
+            <div class="table-header"><h2>신규 에이전시 등록</h2></div>
+            <form id="agency-create-form">
+              <div class="fg">
+                <label>에이전시명</label>
+                <input type="text" id="agency-name-input" required>
+              </div>
+              <div class="fg">
+                <label>로그인 이메일</label>
+                <input type="email" id="agency-email-input" required>
+              </div>
+              <div class="fg">
+                <label>초기 비밀번호</label>
+                <div style="display:flex;gap:6px;">
+                  <input type="text" id="agency-password-input" required minlength="6" placeholder="6자 이상" style="width:140px;">
+                  <button type="button" id="agency-password-generate" class="action-btn">자동생성</button>
+                </div>
+              </div>
+              <button type="submit" class="action-btn" style="background:var(--admin-primary);color:#fff;border-color:var(--admin-primary);">등록</button>
+              <span id="agency-create-message" style="font-size:.85rem;"></span>
+            </form>
+          </div>
+          <div class="table-container">
+            <div class="table-header"><h2>에이전시 목록</h2></div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr><th>에이전시명</th><th>이메일</th><th>예치금</th><th>정산 필요</th><th>관리</th></tr></thead>
+                <tbody id="agency-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════ VIEW: Deposit / Cash ══════════ -->
+        <div id="view-depositcash" class="admin-view" style="display:none;">
+          <div class="table-container">
+            <div class="table-header"><h2>입금 신청 대기 (GCash)</h2></div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr><th>신청일</th><th>에이전시</th><th>금액</th><th>메모</th><th>관리</th></tr></thead>
+                <tbody id="deposit-request-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════ VIEW: Settlement ══════════ -->
+        <div id="view-settlement" class="admin-view" style="display:none;">
+          <div class="table-container" style="margin-bottom:16px;">
+            <div class="table-header"><h2>정산 필요 (예치금 차감 미확정)</h2></div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr><th>날짜</th><th>에이전시</th><th>그룹명</th><th>금액</th><th>관리</th></tr></thead>
+                <tbody id="settlement-deposit-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="table-container">
+            <div class="table-header"><h2>보라카이션 오피스페이 수금 대기</h2></div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr><th>날짜</th><th>에이전시</th><th>그룹명</th><th>금액</th><th>관리</th></tr></thead>
+                <tbody id="settlement-cash-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════ VIEW: Referral ══════════ -->
+        <div id="view-referral" class="admin-view" style="display:none;">
+          <div class="table-container" style="margin-bottom:16px;">
+            <div class="table-header"><h2>레퍼럴 코드 관리</h2></div>
+            <div style="padding:18px 20px;border-bottom:1px solid var(--admin-border);">
+              <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+                <div class="fg">
+                  <label>코드명 (영문/숫자)</label>
+                  <input type="text" id="ref-code-input" placeholder="예: SHANGRI_LA" style="width:180px;" autocomplete="off">
+                </div>
+                <div class="fg">
+                  <label>파트너명</label>
+                  <input type="text" id="ref-name-input" placeholder="예: 샹그릴라 보라카이" style="width:200px;" autocomplete="off">
+                </div>
+                <div class="fg">
+                  <label>수수료율 (%)</label>
+                  <input type="number" id="ref-commission-input" placeholder="10" min="0" max="100" style="width:100px;" autocomplete="off">
+                </div>
+                <button id="ref-create-btn" class="action-btn" style="background:var(--admin-primary);color:#fff;border-color:var(--admin-primary);">+ 코드 생성</button>
+              </div>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <span class="filter-label">기간 필터:</span>
+            <input type="date" id="ref-date-from">
+            <span style="color:var(--admin-text-muted);">~</span>
+            <input type="date" id="ref-date-to">
+            <button id="ref-filter-btn" class="action-btn" style="background:var(--admin-accent);color:#fff;border-color:var(--admin-accent);">조회</button>
+            <button id="ref-filter-clear" class="action-btn">전체</button>
+          </div>
+          <div id="referral-cards"></div>
+        </div>
+
+        <!-- ══════════ VIEW: YEBO ══════════ -->
+        <div id="view-yebo" class="admin-view" style="display:none;">
+          <div class="table-container">
+            <div class="table-header">
+              <h2>YEBO 예약 현황</h2>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <div style="display:flex;gap:3px;background:var(--admin-bg-2);border-radius:8px;padding:3px;">
+                  <button id="yebo-tab-list" onclick="yeboSetTab('list')" style="padding:5px 14px;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;background:var(--admin-accent);color:#fff;">예약 목록</button>
+                  <button id="yebo-tab-month" onclick="yeboSetTab('month')" style="padding:5px 14px;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;background:transparent;color:var(--admin-text-muted);">월별 정산</button>
+                </div>
+                <input type="date" id="yebo-date-from">
+                <span style="color:var(--admin-text-muted);">~</span>
+                <input type="date" id="yebo-date-to">
+                <button id="yebo-filter-btn" class="action-btn" style="background:var(--admin-accent);color:#fff;border-color:var(--admin-accent);">조회</button>
+                <button id="yebo-filter-clear" class="action-btn">전체</button>
+              </div>
+            </div>
+            <div id="yebo-stats"></div>
+            <div id="yebo-view-list">
+              <div style="overflow-x:auto;">
+                <table>
+                  <thead><tr><th>날짜</th><th>예약자</th><th>인원</th><th>국적</th><th>금액</th><th>결제</th><th>레퍼럴</th><th>상태</th><th>정산</th><th>액션</th></tr></thead>
+                  <tbody id="yebo-tbody"><tr><td colspan="9" style="text-align:center;">로딩 중...</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+            <div id="yebo-view-month" style="display:none;padding:16px 20px;">
+              <div id="yebo-month-content"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════ VIEW: Account Management ══════════ -->
+        <div id="view-accounts" class="admin-view" style="display:none;">
+          <div class="table-container">
+            <div class="table-header"><h2>관리자 계정 관리</h2></div>
+            <div id="account-create-section" style="padding:18px 20px;border-bottom:1px solid var(--admin-border);">
+              <p style="font-size:.83rem;color:var(--admin-text-muted);margin:0 0 14px;">새 관리자 계정을 생성합니다. 생성된 계정은 이 어드민 페이지에 로그인할 수 있습니다.</p>
+              <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;">
+                <div class="fg">
+                  <label>이메일</label>
+                  <input type="email" id="acc-email-input" placeholder="admin@example.com" style="width:220px;" autocomplete="off">
+                </div>
+                <div class="fg">
+                  <label>비밀번호 (6자 이상)</label>
+                  <input type="password" id="acc-pw-input" placeholder="••••••••" style="width:160px;" autocomplete="new-password">
+                </div>
+                <div class="fg">
+                  <label>담당자명</label>
+                  <input type="text" id="acc-name-input" placeholder="홍길동" style="width:130px;" autocomplete="off">
+                </div>
+                <button id="acc-create-btn" class="action-btn" style="background:var(--admin-primary);color:#fff;border-color:var(--admin-primary);">+ 계정 생성</button>
+              </div>
+            </div>
+            <div style="overflow-x:auto;">
+              <table>
+                <thead><tr><th>이메일</th><th>담당자명</th><th>상태</th><th>관리</th></tr></thead>
+                <tbody id="accounts-tbody"><tr><td colspan="4" style="text-align:center;">로딩 중...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.content-body -->
+    </main>
+
+  </div><!-- /.layout -->
+</div><!-- /#dashboard -->
+
+<!-- Voucher Preview Modal -->
+<div id="voucher-modal" class="voucher-modal">
+  <div class="voucher-modal-backdrop"></div>
+  <div class="voucher-modal-panel">
+    <button id="voucher-modal-close" class="voucher-modal-close" aria-label="닫기">✕</button>
+    <div id="voucher-modal-body"></div>
+  </div>
+</div>
+
+<script type="module" src="js/admin.js?v=1791290000"></script>
+</body>
+</html>
