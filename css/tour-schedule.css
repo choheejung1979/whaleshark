@@ -1,0 +1,77 @@
+/* 투어 상세페이지 — 당일 일정 타임라인. 강조색은 섹션의 --ts 로 투어별 지정 */
+.ts {
+  background: #F8FAFC;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  padding: 24px 22px 20px;
+  text-align: left;
+}
+.ts-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding-bottom: 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #E5E7EB;
+}
+.ts-head .range { font-size: 1.35rem; font-weight: 900; color: var(--ts); }
+.ts-head .dur { font-size: .92rem; font-weight: 600; color: rgba(28,43,58,.6); }
+
+.ts-list { list-style: none; margin: 0; padding: 0; }
+.ts-list li {
+  display: grid;
+  grid-template-columns: 104px 22px 1fr;
+  align-items: start;
+}
+.ts-time {
+  padding: 14px 0;
+  font-size: .95rem;
+  font-weight: 800;
+  color: var(--ink, #1c2b3a);
+  white-space: nowrap;
+}
+.ts-rail { position: relative; align-self: stretch; }
+.ts-rail::before {
+  content: '';
+  position: absolute;
+  left: 50%; top: 0; bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--ts);
+  opacity: .25;
+}
+.ts-list li:first-child .ts-rail::before { top: 22px; }
+.ts-list li:last-child .ts-rail::before { bottom: auto; height: 22px; }
+.ts-rail::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 16px;
+  width: 12px; height: 12px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--ts);
+}
+.ts-list li.key .ts-rail::after { background: var(--ts); }
+.ts-body { padding: 13px 0 13px 12px; }
+.ts-body b { display: block; font-size: 1rem; color: var(--ink, #1c2b3a); line-height: 1.45; }
+.ts-body small { display: block; margin-top: 2px; font-size: .86rem; color: rgba(28,43,58,.55); line-height: 1.5; }
+.ts-list li.key .ts-body b { color: var(--ts); }
+
+.ts-note {
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px dashed #E5E7EB;
+  font-size: .86rem;
+  line-height: 1.6;
+  color: rgba(28,43,58,.6);
+}
+
+@media (max-width: 520px) {
+  .ts { padding: 20px 16px 16px; }
+  .ts-list li { grid-template-columns: 84px 20px 1fr; }
+  .ts-time { font-size: .86rem; }
+  .ts-body b { font-size: .95rem; }
+}

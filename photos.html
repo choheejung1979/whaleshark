@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>투어 사진 및 영상 다운로드 | Boracay Whale Shark</title>
+<meta name="description" content="보라카이 고래상어 투어 사진과 영상을 날짜별로 확인하고 다운로드하세요.">
+
+<!-- 날짜(?date=)는 조회 조건일 뿐 별도 페이지가 아니므로 전부 이 URL로 모읍니다 -->
+<link rel="canonical" href="https://boracaywhaleshark.com/photos">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="투어 사진 및 영상 | Boracay Whale Shark">
+<meta property="og:description" content="참여하신 날짜를 선택하면 그날의 투어 사진과 영상을 내려받을 수 있습니다.">
+<meta property="og:image" content="https://boracaywhaleshark.com/assets/og-home-ko.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://boracaywhaleshark.com/photos">
+<meta property="og:site_name" content="Boracay Whale Shark">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .photo-main { max-width: 1100px; margin: 0 auto; padding: 120px 20px 80px; }
+  .photo-head { text-align: center; margin-bottom: 36px; }
+  .photo-head h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    font-weight: 900;
+    margin: 0 0 10px;
+    color: var(--color-fg);
+  }
+  .photo-head p { margin: 0; color: #64748b; font-size: 1rem; line-height: 1.6; }
+
+  .photo-picker {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+  .photo-picker input[type="date"] {
+    padding: 14px 18px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-family: inherit;
+    background: #fff;
+    color: var(--color-fg);
+    min-width: 200px;
+  }
+
+  /* 크롬은 날짜 칸의 빈 자리 표시를 브라우저 언어로 그립니다(페이지 언어와
+     무관). 비어 있을 때는 그걸 감추고 사이트 언어로 된 안내를 대신 얹습니다. */
+  .date-field { position: relative; display: inline-block; }
+  .date-field input[type="date"]:not(.has-value)::-webkit-datetime-edit { opacity: 0; }
+  .date-ph {
+    position: absolute;
+    left: 19px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1rem;
+    pointer-events: none;
+  }
+  .date-field input.has-value ~ .date-ph { display: none; }
+  .photo-picker button {
+    padding: 14px 32px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+  }
+  .photo-picker button:hover:not(:disabled) { filter: brightness(1.08); }
+  .photo-picker button:disabled { opacity: 0.55; cursor: default; }
+
+  .photo-notice {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 14px 18px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: var(--radius);
+    color: #92400e;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+  .photo-notice strong {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 800;
+  }
+
+  .photo-status {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    padding: 40px 20px;
+  }
+  .photo-status.error { color: #b91c1c; }
+
+  .photo-preview-note {
+    margin: 0 0 14px;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.92rem;
+  }
+  .photo-preview-note strong { color: var(--color-fg); font-weight: 800; }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .photo-card {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #e2e8f0;
+    aspect-ratio: 4 / 3;
+  }
+  .photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .photo-download {
+    text-align: center;
+  }
+  .photo-download a {
+    display: inline-block;
+    padding: 18px 48px;
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    color: #fff;
+    text-decoration: none;
+    font-size: 1.05rem;
+    font-weight: 800;
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.3);
+    transition: filter 0.2s ease;
+  }
+  .photo-download a:hover { filter: brightness(1.08); }
+  .photo-download p {
+    margin: 14px 0 0;
+    color: #64748b;
+    font-size: 0.86rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 600px) {
+    .photo-main { padding: 100px 16px 60px; }
+    .photo-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="./" class="logo"><img src="assets/mwlogo.webp" alt="Libertad Whale Shark" class="logo-img"><span class="logo-text">BORACAY WHALE SHARK</span></a>
+    <nav class="nav">
+      <a href="./" data-en="Home" data-ko="홈" data-zh="首页" data-ja="ホーム">홈</a>
+      <a href="./#comparison-section" data-en="Tours" data-ko="투어" data-zh="行程" data-ja="ツアー">투어</a>
+      <a href="reservation" data-en="Book Now" data-ko="예약하기" data-zh="立即预订" data-ja="今すぐ予約">예약하기</a>
+      <a href="https://open.kakao.com/o/s0qOPfJi" target="_blank" rel="noopener">카카오 오픈채팅</a>
+    </nav>
+  </div>
+</header>
+
+<main class="photo-main">
+  <div class="photo-head">
+    <h1 data-en="Tour Photos &amp; Videos" data-ko="투어 사진 및 영상" data-zh="行程照片与影片" data-ja="ツアー写真・動画">투어 사진 및 영상</h1>
+    <p data-en="Pick the date you joined the tour to view and download your photos and videos."
+       data-ko="투어에 참여하신 날짜를 선택하시면 사진과 영상을 보고 내려받을 수 있습니다."
+       data-zh="选择您参加行程的日期，即可查看并下载照片与影片。"
+       data-ja="ツアーに参加された日付を選ぶと、写真と動画をご覧いただき、ダウンロードできます。">
+      투어에 참여하신 날짜를 선택하시면 사진과 영상을 보고 내려받을 수 있습니다.
+    </p>
+  </div>
+
+  <div class="photo-picker">
+    <span class="date-field">
+      <input type="date" id="photo-date" aria-label="Tour date">
+      <span class="date-ph" data-en="Select date" data-ko="날짜 선택"
+            data-zh="选择日期" data-ja="日付を選択">날짜 선택</span>
+    </span>
+    <button type="button" id="photo-search"
+            data-en="View Photos" data-ko="사진 보기" data-zh="查看照片" data-ja="写真を見る">사진 보기</button>
+  </div>
+
+  <div class="photo-notice">
+    <strong data-en="Please note" data-ko="유의사항" data-zh="注意事项" data-ja="ご注意">유의사항</strong>
+    <span data-en="Photos and videos are kept for one week from the tour date. Please download them before they are removed."
+          data-ko="사진 및 영상 보관기간은 투어일로부터 1주일입니다. 기간이 지나면 삭제되니 미리 내려받아 주세요."
+          data-zh="照片与影片自行程当日起保存一周。逾期将被删除，请及时下载。"
+          data-ja="写真・動画の保存期間はツアー当日から1週間です。期間を過ぎると削除されますので、お早めにダウンロードしてください。">
+      사진 및 영상 보관기간은 투어일로부터 1주일입니다. 기간이 지나면 삭제되니 미리 내려받아 주세요.
+    </span>
+  </div>
+
+  <div id="photo-status" class="photo-status"></div>
+  <div id="photo-result" hidden>
+    <p class="photo-preview-note" id="photo-preview-note"></p>
+    <div class="photo-grid" id="photo-grid"></div>
+    <div class="photo-download">
+      <a id="photo-openall" href="#" target="_blank" rel="noopener"
+         data-en="View All" data-ko="전체 보기" data-zh="查看全部" data-ja="すべて見る">전체 보기</a>
+      <p data-en="Opens the Google Drive folder with every photo and video from that day, where you can download them."
+         data-ko="그날의 사진과 영상이 모두 담긴 구글 드라이브 폴더가 열립니다. 거기서 내려받으시면 됩니다."
+         data-zh="将打开包含当天全部照片与影片的 Google 云端硬盘资料夹，可在该处下载。"
+         data-ja="その日の写真と動画がすべて入った Google ドライブのフォルダが開き、そこからダウンロードできます。">
+        그날의 사진과 영상이 모두 담긴 구글 드라이브 폴더가 열립니다. 거기서 내려받으시면 됩니다.
+      </p>
+    </div>
+  </div>
+</main>
+
+<script>
+  const PHOTO_ENDPOINT = "https://script.google.com/macros/s/AKfycbzTPR3kwrarZUs7_H8Eta094STF_xmIN7BVyF-6JLhg7KMTQgG4DUbbRBwFVqxa3F0k/exec";
+
+  const MSG = {
+    ko: {
+      pickDate: '날짜를 선택해 주세요.',
+      previewNote: (shown, total) => `총 <strong>${total}개</strong> 중 ${shown}개를 미리 보여드립니다. 전체는 아래에서 확인하세요.`,
+      loading: '불러오는 중입니다...',
+      none: '해당 날짜의 자료가 아직 없습니다.<br>사진과 영상은 투어 후 며칠 내에 올라갑니다.',
+      error: '불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'
+    },
+    en: {
+      pickDate: 'Please choose a date.',
+      previewNote: (shown, total) => `Showing ${shown} of <strong>${total}</strong>. See them all below.`,
+      loading: 'Loading...',
+      none: 'Nothing for that date yet.<br>Photos and videos are usually uploaded within a few days after the tour.',
+      error: 'Could not load the photos. Please try again shortly.'
+    },
+    zh: {
+      pickDate: '请选择日期。',
+      previewNote: (shown, total) => `共 <strong>${total} 个</strong>，此处预览 ${shown} 个。全部内容请见下方。`,
+      loading: '正在载入...',
+      none: '该日期的内容尚未上传。<br>照片与影片通常会在行程结束后几天内上传。',
+      error: '无法载入照片，请稍后再试。'
+    },
+    ja: {
+      pickDate: '日付を選択してください。',
+      previewNote: (shown, total) => `全 <strong>${total}件</strong> のうち ${shown}件 を表示しています。すべては下からご覧ください。`,
+      loading: '読み込んでいます...',
+      none: 'その日付のデータはまだありません。<br>写真と動画はツアー後、数日以内にアップロードされます。',
+      error: '写真を読み込めませんでした。しばらくしてからお試しください。'
+    }
+  };
+
+  // 이 페이지는 /en /zh /ja 사본이 없는 단일 페이지라, 언어를 직접 고릅니다.
+  // 저장된 선택이 없으면 브라우저 언어를 따릅니다.
+  function detectLang() {
+    const saved = localStorage.getItem('ws_lang');
+    if (MSG[saved]) return saved;
+    const nav = (navigator.language || '').toLowerCase();
+    if (nav.startsWith('ko')) return 'ko';
+    if (nav.startsWith('zh')) return 'zh';
+    if (nav.startsWith('ja')) return 'ja';
+    return 'en';
+  }
+
+  const lang = detectLang();
+  const t = MSG[lang];
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const text = el.getAttribute('data-' + lang);
+    if (text) el.innerHTML = text;
+  });
+  document.documentElement.lang = lang;
+
+  const dateEl = document.getElementById('photo-date');
+  const btnEl = document.getElementById('photo-search');
+  const statusEl = document.getElementById('photo-status');
+  const resultEl = document.getElementById('photo-result');
+  const gridEl = document.getElementById('photo-grid');
+  const openAllEl = document.getElementById('photo-openall');
+  const noteEl = document.getElementById('photo-preview-note');
+
+  dateEl.max = new Date().toISOString().slice(0, 10);
+
+  function syncDateFilled() {
+    dateEl.classList.toggle('has-value', !!dateEl.value);
+  }
+  dateEl.addEventListener('input', syncDateFilled);
+  dateEl.addEventListener('change', syncDateFilled);
+
+  function showStatus(html, isError) {
+    statusEl.innerHTML = html;
+    statusEl.className = 'photo-status' + (isError ? ' error' : '');
+    resultEl.hidden = true;
+  }
+
+  async function loadPhotos() {
+    const date = dateEl.value;
+    if (!date) { showStatus(t.pickDate, true); return; }
+
+    btnEl.disabled = true;
+    showStatus(t.loading, false);
+
+    try {
+      const url = PHOTO_ENDPOINT
+        + '?action=listTourPhotos&date=' + encodeURIComponent(date);
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.ok) throw new Error(data.error || 'failed');
+      if (!data.photos || data.photos.length === 0) { showStatus(t.none, false); return; }
+
+      gridEl.innerHTML = '';
+      data.photos.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.src = 'https://drive.google.com/thumbnail?id=' + p.id + '&sz=w600';
+        img.alt = p.name || '';
+
+        card.appendChild(img);
+        gridEl.appendChild(card);
+      });
+
+      // total은 새 Apps Script에서만 옵니다. 없으면 안내문을 비워둡니다.
+      noteEl.innerHTML = (data.total && data.total > data.photos.length)
+        ? t.previewNote(data.photos.length, data.total)
+        : '';
+
+      openAllEl.href = 'https://drive.google.com/drive/folders/' + data.folderId;
+
+      statusEl.innerHTML = '';
+      statusEl.className = 'photo-status';
+      resultEl.hidden = false;
+    } catch (err) {
+      console.error(err);
+      showStatus(t.error, true);
+    } finally {
+      btnEl.disabled = false;
+    }
+  }
+
+  btnEl.addEventListener('click', loadPhotos);
+  dateEl.addEventListener('keydown', e => { if (e.key === 'Enter') loadPhotos(); });
+
+  // 홈 화면 섹션에서 날짜를 골라 넘어온 경우 바로 조회
+  const presetDate = new URLSearchParams(location.search).get('date');
+  if (presetDate && /^\d{4}-\d{2}-\d{2}$/.test(presetDate)) {
+    dateEl.value = presetDate;
+    syncDateFilled();
+    loadPhotos();
+  }
+</script>
+</body>
+</html>
