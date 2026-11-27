@@ -1,0 +1,93 @@
+/* 상세페이지 예약 유도 — 가격표 아래 예약/상담 버튼 + 휴대폰 하단 고정 예약 바.
+   강조색은 블록의 --cta 로 투어별 지정 */
+
+/* ── 가격표 바로 아래 ── */
+.cta-inline { margin: 18px 0 0; }
+.cta-inline .cta-book {
+  display: none;               /* PC는 오른쪽 예약 박스가 있으므로 휴대폰에서만 */
+  text-align: center;
+  padding: 16px 0;
+  border-radius: 99px;
+  background: var(--cta);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-decoration: none;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--cta) 35%, transparent);
+}
+.cta-chat {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.cta-chat a {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 0;
+  border-radius: 99px;
+  font-size: .9rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid #E5E7EB;
+  background: #fff;
+  color: #1c2b3a;
+}
+.cta-chat a.kakao { background: #FEE500; border-color: #FEE500; color: #191919; }
+.cta-chat a.wa { background: #25D366; border-color: #25D366; color: #fff; }
+.cta-chat svg { width: 16px; height: 16px; flex: none; }
+
+/* ── 휴대폰 하단 고정 바 ── */
+.cta-bar { display: none; }
+
+@media (max-width: 900px) {
+  .cta-inline .cta-book { display: block; }
+
+  .cta-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 900;
+    padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(255,255,255,.97);
+    border-top: 1px solid #E5E7EB;
+    box-shadow: 0 -6px 20px rgba(28,43,58,.08);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .cta-bar .price { flex: none; line-height: 1.15; }
+  .cta-bar .price b { display: block; font-size: 1.15rem; font-weight: 900; color: var(--cta); }
+  .cta-bar .price small { font-size: .72rem; color: rgba(28,43,58,.55); font-weight: 600; }
+  .cta-bar .chat {
+    flex: none;
+    width: 46px; height: 46px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+  }
+  .cta-bar .chat.kakao { background: #FEE500; color: #191919; }
+  .cta-bar .chat svg { width: 22px; height: 22px; }
+  .cta-bar .book {
+    flex: 1;
+    text-align: center;
+    padding: 14px 0;
+    border-radius: 99px;
+    background: var(--cta);
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.02rem;
+    text-decoration: none;
+  }
+  /* 고정 바에 마지막 내용이 가리지 않게 */
+  body.has-cta-bar { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+}
+
+/* 한·영 겸용 페이지: 한국어로 볼 때는 카카오톡, 그 외에는 왓츠앱 상담 아이콘 */
+html[lang="ko"] .cta-bar .only-intl,
+html:not([lang="ko"]) .cta-bar .only-ko { display: none; }

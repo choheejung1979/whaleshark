@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOJAMUSSA x Boracay Whale Shark</title>
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="보자무싸 x 보라카이 고래상어 투어 예약">
+<meta property="og:description" content="보자무싸 전용 예약 링크. 패스트트랙 · 레귤러 온라인 예약 즉시 확정.">
+<meta property="og:image" content="https://boracaywhaleshark.com/assets/logos/bojamussa-logo.png">
+<meta property="og:url" content="https://boracaywhaleshark.com/bojamussa">
+<meta property="og:site_name" content="Boracay Whale Shark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  word-break: keep-all;   /* 한글 단어가 중간에서 갈라지지 않게 */
+  font-family: 'Noto Sans KR', sans-serif;
+  background: #fff;
+  color: #111;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  aspect-ratio: 1270 / 517;
+  overflow: hidden;
+}
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  display: block;
+}
+.hero-dim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%);
+}
+.hero-label {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 10px 20px 0;
+  display: grid;
+  grid-template-columns: 1fr 80px;
+  grid-template-rows: auto auto;
+  column-gap: 8px;
+  align-items: center;
+}
+.hero-label .tag {
+  grid-column: 1;
+  grid-row: 1;
+  color: #0ea5e9;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .5px;
+  align-self: end;
+}
+.hero-label h1 {
+  grid-column: 1;
+  grid-row: 2;
+  color: #0f172a;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  font-weight: 900;
+  line-height: 1.1;
+}
+.hero-label h1 em {
+  font-style: normal;
+  color: #0ea5e9;
+}
+.mascot-bubble {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  width: max-content;
+  justify-self: end;
+  background: #fff;
+  border: 2px solid #0ea5e9;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: .72rem;
+  font-weight: 800;
+  color: #0369a1;
+  white-space: nowrap;
+  line-height: 1.5;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  position: relative;
+  text-align: center;
+}
+.mascot-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #0ea5e9;
+}
+.mascot-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #fff;
+  z-index: 1;
+}
+.mascot-img {
+  grid-column: 2;
+  grid-row: 2;
+  width: 100%;
+  align-self: start;
+}
+
+/* ── Body ── */
+.wrap { max-width: 560px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Price ── */
+.price-block {
+  padding: 28px 0 4px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 28px;
+}
+.price-block .per { font-size: .75rem; color: #999; margin-bottom: 4px; }
+.price-block .num { font-size: 2.6rem; font-weight: 900; color: #0ea5e9; letter-spacing: -1px; }
+.price-block .num sup { font-size: 1.1rem; vertical-align: super; font-weight: 700; }
+.price-block .num sub { font-size: .8rem; font-weight: 500; color: #888; vertical-align: bottom; margin-left: 2px; }
+.price-block .note { margin-top: 6px; font-size: .78rem; color: #aaa; }
+
+/* ── Section heading ── */
+.sh {
+  font-size: .7rem;
+  font-weight: 700;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 14px;
+}
+
+/* ── Includes ── */
+.inc-list { list-style: none; margin-bottom: 32px; }
+.inc-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: .92rem;
+  color: #222;
+}
+.inc-list li:last-child { border-bottom: none; }
+.inc-list li .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  flex-shrink: 0;
+}
+
+/* ── Info ── */
+.info-list { margin-bottom: 32px; }
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: .9rem;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row .k { color: #999; font-weight: 500; white-space: nowrap; }
+.info-row .v { font-weight: 600; color: #111; text-align: right; }
+.info-row .v small { display: block; font-size: .74rem; color: #bbb; font-weight: 400; margin-top: 2px; }
+
+/* ── Bottom spacer & CTA ── */
+.spacer { height: 90px; }
+
+.cta-fixed {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  padding: 12px 20px 20px;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #eee;
+}
+.cta-btn {
+  display: block;
+  background: #0ea5e9;
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 15px;
+  border-radius: 12px;
+  letter-spacing: .2px;
+  transition: background .15s;
+}
+.cta-btn:hover { background: #0284c7; }
+
+.bj-head { max-width: 560px; margin: 0 auto; padding: 28px 20px 0; display: flex; align-items: center; gap: 16px; }
+.bj-head img { width: 76px; height: 76px; border-radius: 50%; flex-shrink: 0; }
+.bj-head .tag { color: #1e3a8a; font-size: .85rem; font-weight: 700; letter-spacing: .5px; margin-bottom: 4px; }
+.bj-head h1 { color: #0f172a; font-size: clamp(1.6rem, 6vw, 2.4rem); font-weight: 900; line-height: 1.15; }
+.bj-head h1 em { font-style: normal; color: #0ea5e9; }
+.tours { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 24px; }
+.tour { position: relative; text-align: left; padding: 12px; border: 1.5px solid #e5e7eb; border-radius: 12px; background: #fff; cursor: pointer; font: inherit; color: #111; }
+.tour b { display: block; font-size: .95rem; }
+.tour span { display: block; font-size: .74rem; color: #999; margin-top: 2px; }
+.tour em { display: block; font-style: normal; font-weight: 800; font-size: .92rem; margin-top: 6px; color: #0ea5e9; }
+.tour.on { border-color: #0ea5e9; box-shadow: 0 0 0 1px #0ea5e9 inset; background: #f0f9ff; }
+.tour .best { position: absolute; top: -9px; right: 10px; background: #f59e0b; color: #fff; font-size: .62rem; font-weight: 800; letter-spacing: .8px; padding: 3px 8px; border-radius: 99px; margin: 0; }
+
+/* ── Timetable ── */
+.tt { margin-bottom: 32px; }
+.tt-head { font-size: .86rem; font-weight: 700; color: #111; margin-bottom: 12px; }
+.tt-row { display: grid; grid-template-columns: 74px 1fr; gap: 12px; position: relative; padding: 0 0 14px; }
+.tt-row::before { content: ''; position: absolute; left: 85px; top: 6px; bottom: -6px; width: 2px; background: #eef0f3; }
+.tt-row:nth-last-child(2)::before { display: none; }
+.tt-row .t { font-size: .8rem; font-weight: 800; color: #0ea5e9; padding-top: 1px; white-space: nowrap; }
+.tt-row .d { padding-left: 14px; position: relative; font-size: .9rem; font-weight: 600; color: #222; }
+.tt-row .d::before { content: ''; position: absolute; left: -7px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: #fff; border: 2px solid #0ea5e9; }
+.tt-row .d small { display: block; font-size: .76rem; color: #999; font-weight: 400; margin-top: 2px; }
+.tt-note { font-size: .74rem; color: #aaa; margin-top: 2px; }
+</style>
+<script src="/js/track.js?v=2" defer></script>
+<script>
+// 보자무싸 링크로 들어온 손님은 나중에 메인 사이트에서 예약해도 7일간 BOJAMUSSA 코드가 붙는다
+try { sessionStorage.setItem('ws_ref', 'BOJAMUSSA'); localStorage.setItem('ws_ref_keep', JSON.stringify({ code: 'BOJAMUSSA', at: Date.now() })); } catch (_) {}
+</script>
+</head>
+<body>
+
+<div class="bj-head">
+  <img src="assets/logos/bojamussa-logo.webp" alt="BOJAMUSSA">
+  <div>
+    <h1><span data-i="h1a"></span><br><em data-i="h1b"></em><br><span id="h-tour"></span></h1>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="tours">
+    <button type="button" class="tour" data-tour="F"><span class="best">BEST</span><b data-i="nF"></b><span data-i="sF"></span><em>₱3,600</em></button>
+    <button type="button" class="tour" data-tour="R"><b data-i="nR"></b><span data-i="sR"></span><em>₱2,820</em></button>
+  </div>
+
+  <div class="price-block">
+    <div class="per" data-i="per"></div>
+    <div class="num"><sup>₱</sup><span id="price">3,600</span><sub>/ person</sub></div>
+  </div>
+
+  <p class="sh" data-i="inc"></p>
+  <ul class="inc-list" id="inc"></ul>
+
+  <p class="sh" data-i="info"></p>
+  <div class="info-list" id="info"></div>
+
+  <p class="sh" data-i="tt"></p>
+  <div class="tt" id="tt"></div>
+
+  <div class="spacer"></div>
+</div>
+
+<div class="cta-fixed">
+  <a href="bojamussa-form?tour=F" class="cta-btn" id="cta" data-i="cta"></a>
+</div>
+
+<script>
+(function () {
+  // 언어: 폰 언어가 한국어면 한국어, 그 밖에는 영어 (예약폼에서 고른 언어가 있으면 그걸 따른다)
+  let saved = null;
+  try { saved = localStorage.getItem('ws_lang'); } catch (_) {}
+  // ?lang=en / ?lang=ko 로 강제 (예약폼까지 이어지게 저장)
+  const qLang = new URLSearchParams(location.search).get('lang');
+  if (qLang === 'en' || qLang === 'ko') { saved = qLang; try { localStorage.setItem('ws_lang', qLang); } catch (_) {} }
+  const lang = saved === 'ko' || (!saved && (navigator.language || '').toLowerCase().startsWith('ko')) ? 'ko' : 'en';
+  document.documentElement.lang = lang;
+  // 가격은 reservation.html의 PRICES.FOREIGN과 같아야 한다
+  const L = {
+    ko: {
+      title: '보자무싸 x 보라카이 고래상어', tag: '보자무싸 X 보라카이 션', h1a: '보라카이', h1b: '고래상어',
+      nF: '패스트트랙', sF: '수중 촬영 · 대기 최소화', nR: '레귤러', sR: '기본 구성',
+      per: '1인 요금', inc: '포함 사항', info: '투어 정보', tt: '타임테이블', cta: '예약하기',
+      F: ['입장료 · 관람료 · 환경보호세', '왕복 차량', '구명조끼 · 오리발 대여', '짐 보관 · 생수 제공', '수중 촬영 포함', 'Fast Track — 고래상어 대기 최소화'],
+      R: ['입장료 · 관람료 · 환경보호세', '왕복 공유 차량', '현지 가이드', '구명조끼 · 오리발 대여'],
+      notInc: ['불포함', '수중 촬영, 패스트트랙 입장'],
+      common: [['미팅 장소', '졸리비 메인로드, 보라카이'], ['미팅 시간', '07:30 AM'],
+        ['소요 시간', '약 5~6시간<small>*현장 상황에 따라 소요 시간이 달라질 수 있습니다</small>']],
+      pay: [['결제 방식', '온라인 결제 (카드 · GCash · Maya · QR Ph)'], ['예약 확정', '결제 즉시 이메일로 바우처 발송']],
+      ttHead: '07:30 – 12:30 · 약 5시간', ttNote: '바다·기상 상황에 따라 시간이 달라질 수 있습니다.',
+      rows: [['07:30 AM', '졸리비 메인로드 미팅', ''], ['09:00 AM', '리베르타드로 이동', '약 1시간'], ['09:30 AM', '리베르타드 도착', '브리핑 · 안전 교육'],
+        ['10:00 AM', '고래상어 관람', '약 30분'], ['10:30 AM', '간단한 샤워', ''], ['11:30 AM', '보라카이로 복귀', '약 1시간'], ['12:30 PM', '졸리비 메인로드 도착', '']]
+    },
+    en: {
+      title: 'BOJAMUSSA x Boracay Whale Shark', tag: 'BOJAMUSSA X WHALE SHARK', h1a: 'Boracay', h1b: 'Whale Shark',
+      nF: 'Fast Track', sF: 'Underwater photos · Minimal wait', nR: 'Regular', sR: 'The essentials',
+      per: 'Price per person', inc: 'Included', info: 'Tour information', tt: 'Timetable', cta: 'Book Now',
+      F: ['Entrance, viewing and environmental fees', 'Round-trip land transfer', 'Life vest and fins', 'Luggage storage and drinking water', 'Underwater photos and video', 'Fast Track — minimal waiting time'],
+      R: ['Entrance, viewing and environmental fees', 'Round-trip shared vehicle', 'Local guide', 'Life vest and fins'],
+      notInc: ['Not included', 'Underwater photos, Fast Track entry'],
+      common: [['Meeting point', 'Jollibee Main Road, Boracay'], ['Meeting time', '07:30 AM'],
+        ['Duration', 'About 5–6 hours<small>*May vary with sea and weather conditions</small>']],
+      pay: [['Payment', 'Online (Card · GCash · Maya · QR Ph)'], ['Confirmation', 'E-voucher emailed right after payment']],
+      ttHead: '07:30 – 12:30 · about 5 hours', ttNote: 'Times may vary with sea and weather conditions.',
+      rows: [['07:30 AM', 'Meet at Jollibee, Main Road', ''], ['09:00 AM', 'Transfer to Libertad', 'About 1 hour'], ['09:30 AM', 'Arrive in Libertad', 'Briefing & safety instructions'],
+        ['10:00 AM', 'Whale shark watching', 'About 30 minutes'], ['10:30 AM', 'Quick freshwater rinse', ''], ['11:30 AM', 'Return to Boracay', 'About 1 hour'], ['12:30 PM', 'Drop-off at Jollibee, Main Road', '']]
+    }
+  }[lang];
+  const PRICE = { F: '3,600', R: '2,820' };
+  document.title = L.title;
+  document.querySelectorAll('[data-i]').forEach((el) => { el.textContent = L[el.dataset.i]; });
+  document.getElementById('tt').innerHTML = `<div class="tt-head">${L.ttHead}</div>` +
+    L.rows.map(([t, d, n]) => `<div class="tt-row"><span class="t">${t}</span><span class="d">${d}${n ? `<small>${n}</small>` : ''}</span></div>`).join('') +
+    `<div class="tt-note">${L.ttNote}</div>`;
+  const q = (new URLSearchParams(location.search).get('tour') || '').toUpperCase();
+  let tour = PRICE[q] ? q : 'F';
+  function render() {
+    document.querySelectorAll('.tour').forEach((b) => b.classList.toggle('on', b.dataset.tour === tour));
+    document.getElementById('h-tour').textContent = L['n' + tour];
+    document.getElementById('price').textContent = PRICE[tour];
+    document.getElementById('inc').innerHTML = L[tour].map((s) => `<li><span class="dot"></span>${s}</li>`).join('');
+    document.getElementById('info').innerHTML = [...L.common, ...(tour === 'R' ? [L.notInc] : []), ...L.pay]
+      .map(([k, v]) => `<div class="info-row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+    document.getElementById('cta').href = 'bojamussa-form?tour=' + tour;
+  }
+  document.querySelector('.tours').addEventListener('click', (e) => {
+    const b = e.target.closest('.tour'); if (!b) return; tour = b.dataset.tour; render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>
